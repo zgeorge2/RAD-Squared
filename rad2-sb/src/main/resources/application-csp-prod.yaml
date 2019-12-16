@@ -1,0 +1,27 @@
+##Starter project needs a profile to be passed while application boots up
+# csp-prod profile attaches the service to csp
+
+symphony:
+    auth:
+        # by default everything requires authentication
+        # as a developer you are able to override the defaults
+        # reasons you may want to do this are if your service serves static
+        # content or ....
+        permitAllPaths: /vapsaas/**,/vap-saas/api/vaphealth/**,/swagger*/**,/v2/**
+        csp-service-identifiers:
+        -   symphony-deployment: ${SYMPHONY_DEPLOYMENT:dev}   # TODO changeme  pre-defined env value (dev,staging,prod,perf, local, etc.).
+            csp-service-id: vapservice  # TODO changeme  replace this to appropriate csp service id
+        csp-uri: ${cspUri:null} #http://localhost:8000
+        service-auth-id: ${cspClientId:vapservice} #vapservice
+        service-auth-secret: ${serviceAuthSecret:vapservice} #vapservice
+        service-redirect-uri: ${serviceRedirectUri:http://localhost:9080/core/authn/csp} #http://localhost:9080/core/authn/csp
+
+integration:
+    services:
+    -   name: lemans
+        auth:
+            cspAuthId: ${lemansauthid:test-svc-1}
+            cspAuthSecret: ${lemansauthsecret:Z>Hj+vY9g`4aG$x^}
+        url: ${lemansurl:"http://10.112.73.126:32768"}
+        props:
+            lemans_auth_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI6bGUtbWFucy1nYXRld2F5IiwiYXpwIjoibGUtbWFucy1nYXRld2F5IiwiaXNzIjoiY3NwIiwiZXhwIjoxNTQ0MDIxOTU0LCJwcm4iOiJsZS1tYW5zLWdhdGV3YXlAY3NwLWRlZmF1bHQiLCJpYXQiOjE1NDQwMTI5NTQsImNpZCI6ImxlLW1hbnMtZ2F0ZXdheSJ9.BAhRw8e45NFYX2cnZ30j8Thr8c4hI2Bo0Xdfc7XwdWRLB0uDWs5EpIfW9HDek9SFj5-zfpOfyH59tG9lOnOGMXmc_W6tF9-AxG0-tgJgY_AKWzonhhzbuPInnBuQse5zOUb_BwkcAkNbw5J9G0hvYiNE5C-OhloPYrEqXp2P4ou3I39uVObYLoJlPrnif4TUAQ_s5MWDhOsE8gROJ55l3d116WgXyG9-QJzC8GD5EX31yQghSch8TW4nasLJjktZyq0uBKbI28g3LLT5Tngw4YfIur6qCAjcEMywtjVg_GBEK7OI_qaAVaNQRcUInw4FyZ0HUK9DTn9e-A_5ovi2xQ"

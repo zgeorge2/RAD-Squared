@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+ name: vap-saas-sb-svc
+ namespace: $$NAMESPACE
+ labels:
+   environment: $$DEPLOYMENT_ENVIRONMENT
+   app: vap-saas-sb
+   tenancy : multiple-tenants
+spec:
+ selector:
+   environment: $$DEPLOYMENT_ENVIRONMENT
+   app: vap-saas-sb
+   tenancy : multiple-tenants
+ ports:
+ - name: vap-saas-sb-http
+   protocol: TCP
+   port: 9080
+   targetPort: 9080

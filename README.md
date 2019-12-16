@@ -1,4 +1,8 @@
-# rad2
+Compile:
+	mvn clean install
+Running SprintBoot Shaded Jar:
 
-RAD-Squared (RADxRAD) (REST-ACTOR-DATA GRID for RAPID APPLICATION DEVELOPMENT)
-An archetypal pattern and programming paradigm for scalable micro service architectures. 
+	java  -jar vapaas-sb/target/vapaas-sb-1.0-SNAPSHOT.jar  --server.port=9080 --akka.conf=application_akka_LAX.conf
+	
+
+

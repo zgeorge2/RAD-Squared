@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rad2-core</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>rad2-core</name>
+
+    <parent>
+        <groupId>com.vmware</groupId>
+        <artifactId>rad2</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <jackson.core.version>2.9.6</jackson.core.version>
+        <akka.version>2.5.13</akka.version>
+        <ignite.version>2.7.6</ignite.version>
+        <spring.framework.version>5.0.8.RELEASE</spring.framework.version>
+        <symphony.csp.version>1.5.12.1.2</symphony.csp.version>
+        <symphony.lemans.client.version>1.0.8</symphony.lemans.client.version>
+        <ucp.api.client.version>1.0.0</ucp.api.client.version>
+        <google.code.gson.version>2.8.2</google.code.gson.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>rad2-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.12</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-testkit -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-testkit_2.12</artifactId>
+            <version>${akka.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-remote_2.12</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_2.12</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.ignite/ignite-core -->
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-core</artifactId>
+            <version>${ignite.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.ignite/ignite-indexing -->
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-indexing</artifactId>
+            <version>${ignite.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${google.code.gson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware.le-mans</groupId>
+            <artifactId>le-mans-client</artifactId>
+            <version>${symphony.lemans.client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vmware.xenon</groupId>
+                    <artifactId>slf4j-xenon</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware.ucp.api.client</groupId>
+            <artifactId>ucp-api-client</artifactId>
+            <version>${ucp.api.client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware.ucp</groupId>
+            <artifactId>vap-bridge-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <forkCount>0</forkCount>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

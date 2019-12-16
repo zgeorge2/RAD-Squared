@@ -1,0 +1,47 @@
+{
+  "userName": "admin@ucp.local",
+  "password": "Admin!23",
+  "vCenters": [
+    {
+      "host": "vc01-vap.eng.vmware.com",
+      "userName": "administrator@vsphere.local",
+      "password": "Admin!23",
+      "vms": [
+        {
+          "mor": {
+            "type": "VirtualMachine",
+            "value": "vm-68"
+          },
+          "userName": "root",
+          "password": "VMware@123"
+        }
+      ]
+    }
+  ],
+  "hostedVc": "vc01-vap.eng.vmware.com",
+  "configServiceRequest": {
+    "processDisInSec": "60",
+    "networkDisInSec": "60",
+    "ipDisInSec": "60",
+    "lemansWebUrl": "http://10.112.73.126:32769",
+    "lemansAccessToken": "37VAYfPEfmMljPJ6u7xxmVoelsgeGKJL",
+    "lemansStreams": null
+  },
+  "accessToken": {
+    "name":"vap-ft-key1",
+    "key":"37VAYfPEfmMljPJ6u7xxmVoelsgeGKJL",
+    "orgId":"vmware-cmbu",
+    "tenantId":"f69f98675f2ddc97",
+    "status":"ACTIVE",
+    "createdBy":"test@vmware.com",
+    "documentVersion":0,
+    "documentEpoch":0,
+    "documentKind":"com:vmware:lemans:common:model:AccessKey",
+    "documentSelfLink":"/le-mans/v1/resources/access-keys/vmware-cmbu-vap-ft-key1",
+    "documentUpdateTimeMicros":1544083311571000,
+    "documentUpdateAction":"POST",
+    "documentExpirationTimeMicros":0,
+    "documentOwner":"f5b2f608-658e-4009-a959-f99d4133b193",
+    "documentAuthPrincipalLink":"/core/authz/users/le-mans-gateway"
+  }
+}

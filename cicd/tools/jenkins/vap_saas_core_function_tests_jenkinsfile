@@ -1,0 +1,49 @@
+#!/usr/bin/env groovy
+// Functional Tests pipeline
+pipeline {
+    agent { label 'default' }
+
+    options {
+      timeout(time: 50, unit: 'MINUTES')
+    } 
+
+    tools {
+        jdk '1.8.latest'
+        maven 'mvn_latest'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                timestamps {
+                    dir('vap-saas-core') {
+                        ansiColor('xterm') {
+                            script {
+                                sh 'mvn clean package'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                timestamps {
+                    dir('vap-saas-core') {
+                        ansiColor('xterm') {
+                            script {
+                                sh 'java -jar vapaas-ft/target/vapaas-ft-*.jar vapaas-ft/src/main/resources/testng.xml'
+                            }
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                   step([$class: 'Publisher', reportFilenamePattern: '**/testng-results.xml'])
+                }
+            }
+        }
+    }
+}
