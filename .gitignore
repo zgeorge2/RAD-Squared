@@ -35,4 +35,4 @@ hs_err_pid*
 test-output
 
 # ignite work directories
-ignite
+rad2-sb/ignite
