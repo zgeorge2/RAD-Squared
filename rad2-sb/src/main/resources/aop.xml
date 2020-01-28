@@ -20,13 +20,13 @@
 
     <!-- Patterns -->
     <aspect name="akka.kamon.instrumentation.AskPatternInstrumentation"/>
-    <aspect name="com.vmware.sb.intstrumentation.MessageIntrumentation"/>
+    <aspect name="com.rad2.sb.instrumentation.MessageIntrumentation"/>
   </aspects>
 
   <weaver options="-Xlint:ignore -Xset:weaveJavaxPackages=true">
     <include within="akka..*"/>
     <include within="com.main..*"/>
-    <include within="com.vmware..*"/>
+    <include within="com.rad2..*"/>
 
     <!-- For some weird reason ByteString produces a java.lang.VerifyError after going through the weaver. -->
     <exclude within="akka.util.ByteString"/>

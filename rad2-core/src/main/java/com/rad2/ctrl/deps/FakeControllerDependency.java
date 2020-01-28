@@ -1,0 +1,17 @@
+package com.rad2.ctrl.deps;
+
+import com.rad2.common.utils.PrintUtils;
+
+/**
+ * This class gets autowired into BaseController. it is here only for illustration
+ */
+public class FakeControllerDependency implements IFakeControllerDependency {
+    public void doSomething() {
+        PrintUtils.printToActor("*** [%s] is trying to doSomething Fakey ***", this.getType());
+    }
+
+    public void doSomethingElse() {
+        PrintUtils.printToActor("*** [%s] is trying to doSomethingElse Fakey ***", this.getType());
+    }
+}
+

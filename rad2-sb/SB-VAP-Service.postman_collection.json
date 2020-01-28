@@ -2982,12 +2982,12 @@
 		"basic": [
 			{
 				"key": "password",
-				"value": "VMware@123",
+				"value": "rad2@123",
 				"type": "string"
 			},
 			{
 				"key": "username",
-				"value": "vapsaasadmin@vmware.com",
+				"value": "admin@rad2.com",
 				"type": "string"
 			},
 			{

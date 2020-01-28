@@ -1,9 +1,0 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-
-<suite name="VAP SAAS TestSuite" verbose="1">
-    <test name="VAP SAAS Tests">
-        <packages>
-            <package name="com.vmware.vap.saas.test" />
-        </packages>
-    </test>
-</suite>

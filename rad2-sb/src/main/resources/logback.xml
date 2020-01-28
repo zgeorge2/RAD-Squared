@@ -10,7 +10,7 @@
     </appender>
     <appender name="File"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/vapaas.log</file>
+        <file>log/rad2.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{yyyy-MM-dd HH:mm:ss} [%-5le]  [%t] [%logger]: - %msg%n
@@ -18,14 +18,14 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>log/archived/vapaas.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>log/archived/rad2.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>250MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
-    <logger name="com.vmware." level="debug"
+    <logger name="com.rad2." level="debug"
             additivity="false">
         <appender-ref ref="File" />
         <appender-ref ref="Console" />
