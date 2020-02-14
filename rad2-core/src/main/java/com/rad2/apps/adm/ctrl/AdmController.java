@@ -3,44 +3,64 @@ package com.rad2.apps.adm.ctrl;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rad2.akka.common.IDeferredRequest;
 import com.rad2.akka.router.MasterRouter;
+import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.apps.adm.akka.NodeAdmin;
 import com.rad2.ctrl.BaseController;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
- *
+ * Controller for administrative actions that apply across all applications. Do NOT place application specific
+ * functions here.
  */
 public class AdmController extends BaseController {
+    public void getJobResult(IDeferredRequest<String> req) {
+        getJobRouter().tell(new JobTrackerWorker.GetJobResult(req), ActorRef.noSender());
+    }
+
     public void shutdown() {
         this.getNodeAdmin().tell(new NodeAdmin.ShutdownNode(true), ActorRef.noSender());
     }
-    public void increaseRoutees(IncreaseRouteesDTO dto) {
+
+    public void increaseRoutees(UpdateRouteesDTO dto) {
         this.getRouter(dto.getSystem(), dto.getRouter()).tell(new MasterRouter.IncreaseRoutees(), ActorRef.noSender());
     }
-    public void removeeRoutees(IncreaseRouteesDTO dto) {
+
+    public void removeRoutees(UpdateRouteesDTO dto) {
         this.getRouter(dto.getSystem(), dto.getRouter()).tell(new MasterRouter.RemoveRoutees(), ActorRef.noSender());
     }
+
     private ActorSelection getNodeAdmin() {
         return getAU().getActor(getAU().getLocalSystemName(), NodeAdmin.NODE_ADMIN_NAME);
     }
+
     @Override
     public List<Class> getDependenciesList() {
         List<Class> ret = new ArrayList<>();
         ret.add(AdmAppInitializer.class);
         return ret;
     }
+
     private ActorSelection getRouter(String systemName, String routerName) {
         return getAU().getActor(systemName, routerName);
     }
-    public static class IncreaseRouteesDTO {
+
+    private ActorSelection getJobRouter() {
+        return getRouter(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
+    }
+
+    public static class UpdateRouteesDTO {
         private String router;
         private String system;
+
         @JsonProperty
         public String getRouter() {
             return router;
         }
+
         @JsonProperty
         public String getSystem() {
             return system;

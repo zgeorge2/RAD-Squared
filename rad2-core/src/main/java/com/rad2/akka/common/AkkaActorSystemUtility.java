@@ -122,7 +122,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
     }
 
     /**
-     * Add a new Actor instance, that will be created using props, as a child of the ActorContext
+     * SleepyNoOp a new Actor instance, that will be created using props, as a child of the ActorContext
      *
      * @return
      */

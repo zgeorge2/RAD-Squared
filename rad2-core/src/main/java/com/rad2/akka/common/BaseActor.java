@@ -2,8 +2,10 @@ package com.rad2.akka.common;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
+import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ignite.common.RegistryManager;
 import com.rad2.ignite.common.UsesRegistryManager;
@@ -13,13 +15,13 @@ import java.util.function.Supplier;
 /**
  * This is the minimalistic combination in this module. It is an AbstractActor, and uses a RegistryManager
  */
-public abstract class BaseActor extends AbstractActor implements UsesRegistryManager {
+public abstract class BaseActor extends AbstractActor implements UsesRegistryManager, IJobWorkerClient {
     private RegistryManager rm;
 
     protected BaseActor(RegistryManager rm) {
         this.rm = rm;
         PrintUtils.printToActor("CREATED Actor: [%s]@[%s]", this.getClass().getSimpleName(),
-            this.self().path());
+                this.self().path());
     }
 
     @Override
@@ -28,9 +30,9 @@ public abstract class BaseActor extends AbstractActor implements UsesRegistryMan
      */
     public Receive createReceive() {
         return receiveBuilder()
-            .match(CreateChild.class, this::createChild)
-            .match(Terminate.class, t -> terminate(t))
-            .build();
+                .match(CreateChild.class, this::createChild)
+                .match(Terminate.class, this::terminate)
+                .build();
     }
 
     @ActorMessageHandler
@@ -56,6 +58,10 @@ public abstract class BaseActor extends AbstractActor implements UsesRegistryMan
 
     public final AkkaActorSystemUtility getAU() {
         return this.getRM().getAU();
+    }
+
+    public ActorSelection getJR() {
+        return getAU().getActor(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
     }
 
     /**

@@ -2,6 +2,9 @@ package com.rad2.ctrl;
 
 import com.rad2.akka.common.AkkaActorSystemUtility;
 import com.rad2.common.utils.PrintUtils;
+import com.rad2.ctrl.deps.IFakeControllerDependency;
+import com.rad2.ctrl.deps.IJobRef;
+import com.rad2.ctrl.deps.JobRefFactory;
 import com.rad2.ctrl.deps.UUIDGenerator;
 import com.rad2.ignite.common.RegistryManager;
 import com.rad2.ignite.common.UsesRegistryManager;
@@ -37,11 +40,11 @@ abstract public class BaseController implements ControllerDependencyListProvider
     public <T extends ControllerDependency> void initialize(RegistryManager rm, List<T> deps) {
         this.rm = rm;
         this.depMap = deps.stream()
-            .filter(this::isADependency)
-            .collect(Collectors.toMap(d -> d.getType(), Function.identity()));
+                .filter(this::isADependency)
+                .collect(Collectors.toMap(d -> d.getType(), Function.identity()));
         this.depMap.entrySet().forEach(entry -> {
             PrintUtils.printToActor("*** Initializing Controller [%s] w/ Dep [%s] ***",
-                this.getClass().getSimpleName(), entry.getValue());
+                    this.getClass().getSimpleName(), entry.getValue());
         });
     }
 
@@ -53,12 +56,24 @@ abstract public class BaseController implements ControllerDependencyListProvider
         return rm;
     }
 
+    public IJobRef createJobRef() {
+        return getJobRefFactory().create();
+    }
+
+    private JobRefFactory getJobRefFactory() {
+        return this.getDep(JobRefFactory.class);
+    }
+
+    private IFakeControllerDependency getFakeControllerDependency() {
+        return this.getDep(IFakeControllerDependency.class);
+    }
+
     protected final <T extends ControllerDependency> T getDep(Class depClass) {
         T ret = (T) this.depMap.get(depClass.getSimpleName()); // try by simply name, the way it was stored
         if (ret == null) { // if simple name did not work, scan for assignability
             ret = (T) this.depMap.values().stream()
-                .filter(dep -> depClass.isAssignableFrom(dep.getClass()))
-                .findFirst().get();
+                    .filter(dep -> depClass.isAssignableFrom(dep.getClass()))
+                    .findFirst().get();
         }
         return ret;
     }
@@ -71,8 +86,8 @@ abstract public class BaseController implements ControllerDependencyListProvider
     private HashSet<Class<? extends ControllerDependency>> createDependencySet() {
         HashSet<Class<? extends ControllerDependency>> ret = new HashSet<>();
         ret.add(UUIDGenerator.class);
+        ret.add(JobRefFactory.class);
         this.getDependenciesList().forEach(ret::add);
-
         return ret;
     }
 
@@ -84,6 +99,6 @@ abstract public class BaseController implements ControllerDependencyListProvider
      */
     private <T extends ControllerDependency> boolean isADependency(T depInstance) {
         return this.commonDependencies.stream()
-            .anyMatch(clz -> clz.isAssignableFrom(depInstance.getClass()));
+                .anyMatch(clz -> clz.isAssignableFrom(depInstance.getClass()));
     }
 }

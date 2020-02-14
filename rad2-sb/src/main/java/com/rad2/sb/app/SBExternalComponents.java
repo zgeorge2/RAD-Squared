@@ -2,6 +2,7 @@ package com.rad2.sb.app;
 
 import com.rad2.akka.common.SystemProperties;
 import com.rad2.apps.adm.ctrl.AdmAppInitializer;
+import com.rad2.ctrl.deps.JobRefFactory;
 import com.rad2.apps.bank.ctrl.BankingAppInitializer;
 import com.rad2.apps.nfv.ctrl.NFVAppInitializer;
 import com.rad2.apps.nfv.ctrl.ThirdPartyInitializer;
@@ -134,6 +135,11 @@ public class SBExternalComponents {
     @Bean
     ControllerDependency createYetAnotherFakeControllerDependency(RegistryManager rm) {
         return new YetAnotherFakeControllerDependency(rm);
+    }
+
+    @Bean
+    ControllerDependency createJobRefFactory(RegistryManager rm) {
+        return new JobRefFactory(rm);
     }
 
     @Bean

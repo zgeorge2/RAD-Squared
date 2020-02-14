@@ -1,4 +1,4 @@
-package com.rad2.ignite.util;
+package com.rad2.apps.adm.ignite;
 
 import java.util.Arrays;
 import java.util.Objects;

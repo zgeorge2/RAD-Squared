@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rad2.akka.common.AkkaAskAndWait;
+import com.rad2.akka.common.IDeferredRequest;
 import com.rad2.apps.bank.akka.Account;
 import com.rad2.apps.bank.akka.AccountHolder;
 import com.rad2.apps.bank.akka.Bank;
@@ -12,9 +13,8 @@ import com.rad2.ctrl.BaseController;
 import com.rad2.ctrl.deps.IFakeControllerDependency;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * The BankController acts as the central brain of the application, it receives instructions from the
@@ -32,7 +32,7 @@ public class BankController extends BaseController {
 
     public void initiateFibonacci(int senderRewards, int numLoops) {
         this.getBankingCentral().tell(new BankingCentral.InitiateFibonacci(senderRewards, numLoops),
-            ActorRef.noSender());
+                ActorRef.noSender());
     }
 
     public void addLocalBankAndAccountHolders(BanksDTO banks) {
@@ -59,7 +59,7 @@ public class BankController extends BaseController {
         String toAHName = fromAHName; // intra account - so same account holder
         String toAccName = Account.AccountNameEnum.validateAccountName(toAccount);
         transferMoney(fromSysName, fromBankName, fromAHName, fromAccName, toSysName, toBankName,
-            toAHName, toAccName, amount);
+                toAHName, toAccName, amount);
     }
 
     public void interAccountHolderMoneyTransfer(String fromBankName, String fromAHName,
@@ -69,7 +69,7 @@ public class BankController extends BaseController {
         String fromAccName = Account.AccountNameEnum.NRO.getName();
         String toAccName = fromAccName; // use the same type of account
         transferMoney(fromSysName, fromBankName, fromAHName, fromAccName, toSysName, toBankName,
-            toAHName, toAccName, amount);
+                toAHName, toAccName, amount);
     }
 
     private void transferMoney(String fromSysName, String fromBankName, String fromAHName, String fromAccName,
@@ -84,81 +84,76 @@ public class BankController extends BaseController {
 
     public void accrueMonthlyBankInterestInLocalBanks() {
         this.getBankingCentral().tell(new BankingCentral.AccrueMonthlyBankInterestInLocalBanks(),
-            ActorRef.noSender());
+                ActorRef.noSender());
     }
 
     public String getAllAccountHoldersFromBank(String bankName) {
         ActorSelection bank = this.getBank(bankName);
         AkkaAskAndWait<Bank.GetAllAccountHolders, Bank.GetAllAccountHoldersResult> ask =
-            new AkkaAskAndWait<>(bank);
+                new AkkaAskAndWait<>(bank);
         Bank.GetAllAccountHoldersResult ret = ask.askAndWait(new Bank.GetAllAccountHolders(), 10);
         return ret.toString();
     }
 
-    public String getAllAccountHoldersOfAllBanks() {
-        AkkaAskAndWait<BankingCentral.GetAllAccountHoldersOfAllBanks,
-            BankingCentral.GetAllAccountHoldersOfAllBanksResult> ask =
-            new AkkaAskAndWait<>(this.getBankingCentral());
-        BankingCentral.GetAllAccountHoldersOfAllBanksResult ret =
-            ask.askAndWait(new BankingCentral.GetAllAccountHoldersOfAllBanks(), 10);
+    public String getAllAccountHolders() {
+        AkkaAskAndWait<BankingCentral.GetAllAccountHolders,
+                BankingCentral.AllAccHoldersResult> ask =
+                new AkkaAskAndWait<>(this.getBankingCentral());
+        BankingCentral.AllAccHoldersResult ret =
+                ask.askAndWait(new BankingCentral.GetAllAccountHolders(), 10);
         return ret.result();
+    }
+
+    public void getAllAccountHoldersDeferred(IDeferredRequest<String> req) {
+        this.getBankingCentral().tell(new BankingCentral.GetAllAccountHoldersDeferred(req), ActorRef.noSender());
     }
 
     public void printAllAccountNamesInAllBanks() {
         this.getBankingCentral().tell(new BankingCentral.PrintAllAccountNamesInAllBanks(),
-            ActorRef.noSender());
+                ActorRef.noSender());
     }
 
-    public void printAccountStatementsOfLocalBanks() {
-        this.getBankingCentral().tell(new BankingCentral.PrintAccountStatementOfLocalBanks(),
-            ActorRef.noSender());
-    }
-
-    public void printAccountStatementsOfLocalBanksByCount(PrintAccountStatementByCountDTO requiredStatements) {
-        Map<ActorSelection, Integer> statementsCount = new HashMap<>();
-        if(requiredStatements != null) {
-            requiredStatements.getRequiredStatements().forEach(statement -> {
-                statementsCount.put(getBank(statement.getBankName()), statement.getCount());
-            });
+    public void printBanksByCount(BankCountCollectionDTO bcColl) {
+        if (bcColl == null) {
+            return;
         }
-
-        statementsCount.keySet().forEach((actor) -> {
-            for(int i = 0 ; i < statementsCount.get(actor) ; i++ ) {
-                actor.tell(new Bank.Print(), ActorRef.noSender());
-            }
+        bcColl.getBCs().forEach(bc -> {
+            IntStream.range(0, bc.getCount()).forEach(i -> {
+                printBankByName(bc.getBankName());
+            });
         });
+    }
 
+    public void printLocalBanks() {
+        this.getBankingCentral().tell(new BankingCentral.PrintLocalBanks(), ActorRef.noSender());
     }
 
     public void printBankBySelection(String bankName) {
         this.getBankingCentral().tell(new BankingCentral.PrintBankBySelection(bankName), ActorRef.noSender());
     }
 
-    public void printAccountStatementOfBank(String bankName) {
-        getBank(bankName).tell(new Bank.Print(), ActorRef.noSender());
+    public void printBankByName(String bankName) {
+        this.getBankingCentral().tell(new BankingCentral.PrintBankByName(bankName), ActorRef.noSender());
     }
 
     public String broadcastMessage(String message) {
         String systemName = this.getAU().getLocalSystemName();
         final String msg = String.format("From /[%s]: " + "\n*********\n[%s]\n*********\n", systemName,
-            message);
+                message);
 
         this.getBankingCentral().tell(new BankingCentral.BroadcastMessage(msg), ActorRef.noSender());
         return msg;
     }
 
-    public void doAdd(PrintAccountStatementByCountDTO requiredStatements) {
-        Map<ActorSelection, Integer> statementsCount = new HashMap<>();
-        if(requiredStatements != null) {
-            requiredStatements.getRequiredStatements().forEach(statement -> {
-                statementsCount.put(getBank(statement.getBankName()), statement.getCount());
-            });
+    public void doSleepyNoOp(BankCountCollectionDTO bcColl) {
+        if (bcColl == null) {
+            return;
         }
-
-        statementsCount.keySet().forEach((actor) -> {
-            for(int i = 0 ; i < statementsCount.get(actor) ; i++ ) {
-                actor.tell(new Bank.Add(), ActorRef.noSender());
-            }
+        bcColl.getBCs().forEach(bc -> {
+            ActorSelection bank = getBank(bc.getBankName());
+            IntStream.range(0, bc.getCount()).forEach(i -> {
+                bank.tell(new AccountHolder.SleepyNoOp(4, 5, 500), ActorRef.noSender());
+            });
         });
     }
 
@@ -230,7 +225,7 @@ public class BankController extends BaseController {
         }
     }
 
-    public static class PrintAccountStatementDTO {
+    public static class BankCountDTO {
         private String bankName;
         private int count;
 
@@ -251,15 +246,15 @@ public class BankController extends BaseController {
         }
     }
 
-    public static class PrintAccountStatementByCountDTO {
-        List<PrintAccountStatementDTO> requiredStatements;
+    public static class BankCountCollectionDTO {
+        List<BankCountDTO> bcs;
 
-        public List<PrintAccountStatementDTO> getRequiredStatements() {
-            return requiredStatements;
+        public List<BankCountDTO> getBCs() {
+            return bcs;
         }
 
-        public void setRequiredStatements(List<PrintAccountStatementDTO> requiredStatements) {
-            this.requiredStatements = requiredStatements;
+        public void setBcs(List<BankCountDTO> bcs) {
+            this.bcs = bcs;
         }
     }
 }

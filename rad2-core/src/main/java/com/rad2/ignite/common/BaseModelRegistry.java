@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseModelRegistry<K extends DModel>
-    implements INAryTreeNodeData, UsesRegistryManager {
+        implements INAryTreeNodeData, UsesRegistryManager {
     private RegistryManager rm;
     private BaseModelQueries<K> queryMap;
 
@@ -103,17 +103,29 @@ public abstract class BaseModelRegistry<K extends DModel>
     /**
      * Actor State that needs to be updated to the registry is created by the Function and then added to the
      * registry. The method then returns the pKey for the entry
-     *
-     * @return
      */
     public final <R extends RegistryStateDTO> String update(String key, Function<K, R> func) {
         return this.update(this.apply(key, func));
     }
 
     /**
+     * remove the registry entry
+     */
+    public <K extends DModel> void remove(K model) {
+        if (model == null) return;
+        this.queryMap.remove(model.getKey());
+    }
+
+    /**
+     * For all registry entries whose parent is the parentKey, remove entries that pass the function matcher
+     */
+    public void removeChildrenOfParentMatching(String parentKey, Function<K, Boolean> matcher) {
+        this.getQueryMap().removeChildrenOfParentMatching(parentKey, matcher);
+    }
+
+    /**
      * For the registry object matching the key, apply the Function
      *
-     * @return
      */
     public <R> R apply(String key, Function<K, R> func) {
         return this.getQueryMap().apply(key, func);
@@ -249,11 +261,6 @@ public abstract class BaseModelRegistry<K extends DModel>
     @Override
     public RegistryManager getRM() {
         return this.rm;
-    }
-
-    public <K extends DModel> void remove(K model) {
-        if (model == null) return;
-        this.queryMap.remove(model.getKey());
     }
 }
 

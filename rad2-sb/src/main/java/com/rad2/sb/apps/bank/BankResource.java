@@ -1,10 +1,13 @@
 package com.rad2.sb.apps.bank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rad2.apps.bank.akka.BankingCentral;
 import com.rad2.apps.bank.ctrl.BankController;
 import com.rad2.sb.res.BaseResource;
+import com.rad2.sb.res.DeferredRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.Callable;
 
@@ -45,21 +48,21 @@ public class BankResource extends BaseResource<BankController> {
     @GetMapping("")
     public PrintOut printAccountStatementsOfLocalBanks() {
         logger.info("GET /bank");
-        this.getC().printAccountStatementsOfLocalBanks();
+        this.getC().printLocalBanks();
         return new PrintOut("PrintAccountStatementsOfLocalBanks");
     }
 
     @PostMapping("printAccountStatementByCount")
-    public PrintOut printAccountStatementByCount(@RequestBody BankController.PrintAccountStatementByCountDTO requiredStatements) {
+    public PrintOut printAccountStatementByCount(@RequestBody BankController.BankCountCollectionDTO bcList) {
         logger.info("GET /printAccountStatementByCount");
-        this.getC().printAccountStatementsOfLocalBanksByCount(requiredStatements);
+        this.getC().printBanksByCount(bcList);
         return new PrintOut("printAccountStatementByCount");
     }
 
     @GetMapping("/{bn}")
     public PrintOut printAccountStatementOfBank(@PathVariable("bn") String bn) {
         logger.info(String.format("GET /bank/{%s}", bn));
-        this.getC().printAccountStatementOfBank(bn);
+        this.getC().printBankByName(bn);
         return new PrintOut(String.format("PrintAccountStatementOfBank : /[%s]", bn));
     }
 
@@ -67,7 +70,7 @@ public class BankResource extends BaseResource<BankController> {
     public PrintOut printBankBySelection(@PathVariable("bn") String bn) {
         logger.info(String.format("GET /bank/{%s}/printBankBySelection", bn));
         this.getC().printBankBySelection(bn);
-        return new PrintOut(String.format("PrintBankBySelection", bn));
+        return new PrintOut(String.format("PrintBankBySelection: [%s]", bn));
     }
 
     @PutMapping("/{bn}/accountHolder/{ah}")
@@ -93,16 +96,20 @@ public class BankResource extends BaseResource<BankController> {
     }
 
     @GetMapping("/getAllAccountHolders")
-    public Callable<ResponseEntity<PrintOut>> getAllAccountHoldersOfAllBanks() {
+    public Callable<ResponseEntity<PrintOut>> getAllAccountHolders() {
         logger.info("GET getAllAccountHoldersOfAllBanks");
-        return () -> ResponseEntity.ok(new PrintOut(this.getC().getAllAccountHoldersOfAllBanks()));
+        return () -> ResponseEntity.ok(new PrintOut(this.getC().getAllAccountHolders()));
     }
 
-    @PostMapping("/doAdd")
-    public PrintOut doAdd(@RequestBody BankController.PrintAccountStatementByCountDTO requiredStatements) {
-        logger.info("POST /doAdd");
-        this.getC().doAdd(requiredStatements);
-        return new PrintOut("Adding a lot in all account holders");
+    @GetMapping("/getAllAccHoldersDeferred/{waitTime}")
+    public DeferredResult<ResponseEntity<String>> getAllAccHoldersDeferred(@PathVariable long waitTime) {
+        logger.info("GET getAllAccHoldersDeferred");
+        DeferredRequest req = new DeferredRequest(getC().createJobRef());
+        req.putArg(BankingCentral.GetAllAccountHoldersDeferred.WAIT_TIME_KEY, waitTime);
+        this.getC().getAllAccountHoldersDeferred(req);
+        logger.info("Returning from GET getAllAccHoldersDeferred");
+        // return the deferred result (NOT the actual one, that comes later, hopefully)
+        return req.getResult();
     }
 
     @GetMapping("/{bn}/getAllAccountHolders")
@@ -112,6 +119,13 @@ public class BankResource extends BaseResource<BankController> {
         return new PrintOut(String.format("Account Holders : %s", ret));
     }
 
+    @PostMapping("/doSleepyNoOp")
+    public PrintOut doSleepyNoOp(@RequestBody BankController.BankCountCollectionDTO requiredStatements) {
+        logger.info("POST /doSleepyNoOp");
+        this.getC().doSleepyNoOp(requiredStatements);
+        return new PrintOut("Doing a whole lot of nothing sleepily in AccountHolders");
+    }
+
     @PutMapping("/{bn}/accountHolder/{ah}/account/{ac}/transferTo/{toAC}/{amt}")
     public PrintOut addIntraAccountTransaction(@PathVariable("bn") String bn,
                                                @PathVariable("ah") String ah,
@@ -119,10 +133,10 @@ public class BankResource extends BaseResource<BankController> {
                                                @PathVariable("toAC") String toAC,
                                                @PathVariable("amt") int amt) {
         logger.info(String.format("PUT /bank/{%s}/accountHolder/{%s}/account/{%s}/transferTo/{%s}/{%s}",
-            bn, ah, ac, toAC, amt));
+                bn, ah, ac, toAC, amt));
         this.getC().intraAccountHolderMoneyTransfer(bn, ah, ac, toAC, amt);
         return new PrintOut(String.format("MT: From {/[%s]/[%s]/[%s] -> [%s] of (Rs. [%d])",
-            bn, ah, ac, toAC, amt));
+                bn, ah, ac, toAC, amt));
     }
 
     @PutMapping("/{bn}/accountHolder/{ah}/transferRemote/{toSN}/{toBN}/{toAH}/{amt}")
@@ -133,10 +147,10 @@ public class BankResource extends BaseResource<BankController> {
                                                @PathVariable("toAH") String toAH,
                                                @PathVariable("amt") int amt) {
         logger.info(String.format("PUT /bank/{%s}/accountHolder/{%s}/transferRemote/{%s}/{%s}/{%s}/{%s}",
-            bn, ah, toSN, toBN, toAH, amt));
+                bn, ah, toSN, toBN, toAH, amt));
         this.getC().interAccountHolderMoneyTransfer(bn, ah, toSN, toBN, toAH, amt);
         return new PrintOut(String.format("\"Remote MT: From /[%s]/[%s]/[NRO] -> " +
-            "/[%s]/[%s]/[%s]/[NRO] of (Rs. [%d])", bn, ah, toSN, toBN, toAH, amt));
+                "/[%s]/[%s]/[%s]/[NRO] of (Rs. [%d])", bn, ah, toSN, toBN, toAH, amt));
     }
 
     @GetMapping("/broadcast/{message}")

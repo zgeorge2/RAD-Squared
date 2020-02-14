@@ -2,8 +2,10 @@ package com.rad2.akka.common;
 
 import akka.actor.AbstractActorWithTimers;
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
+import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ignite.common.RegistryManager;
 import com.rad2.ignite.common.UsesRegistryManager;
@@ -11,29 +13,29 @@ import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * In addition to BaseActor characteristics, this actor also uses Timers
  */
-public abstract class BaseActorWithTimer
-    extends AbstractActorWithTimers implements UsesRegistryManager {
+public abstract class BaseActorWithTimer extends AbstractActorWithTimers
+        implements UsesRegistryManager, IJobWorkerClient {
     private RegistryManager rm;
 
-    protected BaseActorWithTimer(RegistryManager rm) {
+    protected BaseActorWithTimer(RegistryManager rm, Tick tick) {
         this.rm = rm;
         PrintUtils.printToActor("CREATED Timer Actor: [%s]@[%s]", this.getClass().getSimpleName(),
-            this.self().path());
+                this.self().path());
+        startTimer(tick);
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-            .match(BaseActor.CreateChild.class, this::createChild)
-            .match(Tick.class, t -> tick(t))
-            .match(Terminate.class, t -> terminate(t))
-            .build();
+                .match(BaseActor.CreateChild.class, this::createChild)
+                .match(Tick.class, this::tick)
+                .match(Terminate.class, this::terminate)
+                .build();
     }
 
     @ActorMessageHandler
@@ -53,12 +55,21 @@ public abstract class BaseActorWithTimer
         return this.getRM().getAU();
     }
 
+    public ActorSelection getJR() {
+        return getAU().getActor(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
+    }
+
     /**
      * handle the tick
      */
     private void tick(Tick t) {
-        t.getTickHandler().accept(t); // delegate back to the handler that was instantiated into the Tick
+        this.onTick(t); // delegate back to the handler that was instantiated into the Tick
     }
+
+    /**
+     * Override to handle ticks
+     */
+    protected abstract void onTick(Tick t);
 
     /**
      * start the timer
@@ -97,29 +108,22 @@ public abstract class BaseActorWithTimer
         }
     }
 
-    static public class Tick<T> {
+    static public class Tick {
+        private static final String TICK_KEY_PREFIX = "TT_";
         private final TickTypeEnum tickTypeEnum;
-        private final T tickKey; // unique identifier of this tick
+        private final String tickKey; // unique identifier of this tick
         private final FiniteDuration tickDuration; // the finite duration of each Tick
-        private final Consumer<? extends Tick<T>> tickHandler;
 
         /**
          * @param tickTypeEnum the type of ticking needed
-         * @param tickHandler  must implement action to perform when Tick happens
          * @param tickKey      unique identifier of this Tick message
          * @param tickDuration the duration in tickUnits of this tick
          * @param tickUnit     the unit of the duration
          */
-        public Tick(TickTypeEnum tickTypeEnum, Consumer<? extends Tick<T>> tickHandler,
-                    T tickKey, long tickDuration, TimeUnit tickUnit) {
+        public Tick(TickTypeEnum tickTypeEnum, String tickKey, long tickDuration, TimeUnit tickUnit) {
             this.tickTypeEnum = tickTypeEnum;
-            this.tickHandler = tickHandler;
-            this.tickKey = tickKey;
+            this.tickKey = TICK_KEY_PREFIX + tickKey;
             this.tickDuration = Duration.create(tickDuration, tickUnit);
-        }
-
-        public Consumer<? extends Tick<T>> getTickHandler() {
-            return tickHandler;
         }
 
         public TickTypeEnum getType() {
@@ -130,7 +134,7 @@ public abstract class BaseActorWithTimer
             return this.tickDuration;
         }
 
-        public T getKey() {
+        public String getKey() {
             return tickKey;
         }
 

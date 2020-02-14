@@ -4,6 +4,8 @@ import akka.actor.ActorRef;
 import akka.routing.RoundRobinRoutingLogic;
 import com.rad2.akka.router.MasterRouter;
 import com.rad2.akka.router.WorkerClassArgs;
+import com.rad2.apps.adm.akka.JobTrackerAdmin;
+import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.apps.adm.akka.NodeAdmin;
 import com.rad2.apps.bank.akka.Printer;
 import com.rad2.ctrl.ControllerDependency;
@@ -20,6 +22,10 @@ public class AdmAppInitializer implements ControllerDependency {
         createNodeAdmin(rm);
         // add a couple of printers with a router
         createPrinters(rm);
+        // set up a job tracker admin to clean up state JobTrackerRegistry entries
+        createJobTrackerAdmin(rm);
+        // add a few job trackers
+        createJobTrackers(rm);
         // add a shutdown hook
         rm.getAU().setupActorSystemShutdown();
     }
@@ -29,12 +35,25 @@ public class AdmAppInitializer implements ControllerDependency {
             args.put(Printer.BANNER_KEY, "PRINTER_BANNER");
         };
         rm.getAU().add(() -> MasterRouter.props(rm, new RoundRobinRoutingLogic(), 5,
-            Printer::props, wargsSupplier), Printer.PRINTER_MASTER_ROUTER_NAME)
-            .tell(new MasterRouter.Initialize(), ActorRef.noSender());
+                Printer::props, wargsSupplier), Printer.PRINTER_MASTER_ROUTER_NAME)
+                .tell(new MasterRouter.Initialize(), ActorRef.noSender());
+    }
+
+    private void createJobTrackers(RegistryManager rm) {
+        Consumer<WorkerClassArgs> wargsSupplier = (args) -> {
+            args.put(JobTrackerWorker.BANNER_KEY, "JOB_TRACKER_BANNER");
+        };
+        rm.getAU().add(() -> MasterRouter.props(rm, new RoundRobinRoutingLogic(), 5,
+                JobTrackerWorker::props, wargsSupplier), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER)
+                .tell(new MasterRouter.Initialize(), ActorRef.noSender());
     }
 
     private void createNodeAdmin(RegistryManager rm) {
         rm.getAU().add(() -> NodeAdmin.props(rm), NodeAdmin.NODE_ADMIN_NAME);
+    }
+
+    private void createJobTrackerAdmin(RegistryManager rm) {
+        rm.getAU().add(() -> JobTrackerAdmin.props(rm), JobTrackerAdmin.JT_ADMIN_NAME);
     }
 }
 

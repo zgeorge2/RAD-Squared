@@ -3,9 +3,11 @@ package com.rad2.apps.bank.akka;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.Props;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActor;
-import com.rad2.akka.router.WorkerClassArgs;
+import com.rad2.akka.common.BasicDeferredMessage;
+import com.rad2.akka.common.IDeferredRequest;
 import com.rad2.apps.bank.ignite.AccountHolderRegistry;
 import com.rad2.apps.bank.ignite.AccountRegistry;
 import com.rad2.apps.bank.ignite.BankRegistry;
@@ -31,39 +33,37 @@ public class BankingCentral extends BaseActor {
         return Props.create(BankingCentral.class, rm);
     }
 
-    static public Props props(WorkerClassArgs args) {
-        return props(args.getRM());
-    }
-
     @Override
     public Receive createReceive() {
         return super.createReceive()
-            .orElse(receiveBuilder()
-                .match(AccrueMonthlyBankInterestInLocalBanks.class,
-                    this::accrueMonthlyBankInterestInLocalBanks)
-                .match(RewardBanksInSender.class, this::rewardBanksInSender)
-                .match(PrintAllAccountNamesInAllBanks.class, this::printAllAccountNamesInAllBanks)
-                .match(PrintAccountStatementOfLocalBanks.class, this::printAccountStatementOfLocalBanks)
-                .match(PrintBankBySelection.class, this::printBankBySelection)
-                .match(GetAllAccountHoldersOfAllBanks.class, this::getAllAccountHoldersOfAllBanks)
-                .match(InitiateFibonacci.class, this::initiateFibonacci)
-                .match(GenerateNextFibonacci.class, this::generateNextFibonacci)
-                .match(PrintFibonacci.class, this::printFibonacci)
-                .match(BroadcastMessage.class, this::broadcastMessage)
-                .match(ReceiveBroadcastMessage.class, this::receiveBroadcastMessage)
-                .build());
+                .orElse(receiveBuilder()
+                        .match(AccrueMonthlyBankInterestInLocalBanks.class,
+                                this::accrueMonthlyBankInterestInLocalBanks)
+                        .match(RewardBanksInSender.class, this::rewardBanksInSender)
+                        .match(PrintAllAccountNamesInAllBanks.class, this::printAllAccountNamesInAllBanks)
+                        .match(PrintLocalBanks.class, this::printLocalBanks)
+                        .match(PrintBankBySelection.class, this::printBankBySelection)
+                        .match(PrintBankByName.class, this::printBankByName)
+                        .match(GetAllAccountHolders.class, this::getAllAccountHoldersOfAllBanks)
+                        .match(GetAllAccountHoldersDeferred.class, this::getAllAccountHoldersOfAllBanksDeferred)
+                        .match(InitiateFibonacci.class, this::initiateFibonacci)
+                        .match(GenerateNextFibonacci.class, this::generateNextFibonacci)
+                        .match(PrintFibonacci.class, this::printFibonacci)
+                        .match(BroadcastMessage.class, this::broadcastMessage)
+                        .match(ReceiveBroadcastMessage.class, this::receiveBroadcastMessage)
+                        .build());
     }
 
     @ActorMessageHandler
     private void accrueMonthlyBankInterestInLocalBanks(AccrueMonthlyBankInterestInLocalBanks i) {
         // send a message to each bank to accrue interest.
-        getAllLocalBanks().forEach(b -> b.tell(new Account.AccrueInterest(), self()));
+        getAllLocalBanks().forEach(b -> getBank(b).tell(new Account.AccrueInterest(), self()));
     }
 
     @ActorMessageHandler
     private void rewardBanksInSender(RewardBanksInSender arg) {
         // send a message to each bank to accrue extra rewards in the form of interest.
-        getAllLocalBanks().forEach(b -> b.tell(new AccountHolder.AccrueRewardPoints(), self()));
+        getAllLocalBanks().forEach(b -> getBank(b).tell(new AccountHolder.AccrueRewardPoints(), self()));
     }
 
     @ActorMessageHandler
@@ -78,36 +78,42 @@ public class BankingCentral extends BaseActor {
     }
 
     @ActorMessageHandler
-    private void printAccountStatementOfLocalBanks(PrintAccountStatementOfLocalBanks arg) {
-        Function<BankRegistry.DBank, Boolean> func = (BankRegistry.DBank d) -> {
-            this.getAU().getActorNamed(d.getName()).tell(new Bank.Print(), self());
-            return true;
-        };
-        reg(BankRegistry.class).applyToChildrenOfParent(this.getAU().getLocalSystemName(), func);
+    private void printLocalBanks(PrintLocalBanks arg) {
+        getAllLocalBanks().forEach(this::printBank);
     }
 
     @ActorMessageHandler
-    public void printBankBySelection(PrintBankBySelection arg) {
-        getBankBySelection(arg.bankName).forEach(b -> b.tell(new Bank.Print(), self()));
+    private void printBankByName(PrintBankByName arg) {
+        this.printBank(arg.bankName);
     }
 
     @ActorMessageHandler
-    private void getAllAccountHoldersOfAllBanks(GetAllAccountHoldersOfAllBanks arg) {
-        AccountHolderRegistry reg = this.reg(AccountHolderRegistry.class);
-        final ActorSelection router = getPrinterRouter();
-        StringBuffer sb = new StringBuffer();
-        Function<AccountHolderRegistry.DAccountHolder, Boolean> func = (ah) -> {
-            String msg = String.format("******* AH = [%s] *******", ah.getKey());
-            sb.append(msg); // short op
-            for (int ii = 0; ii < 1; ii++) {// repeat several long running ops
-                String msgId = String.format("JOB:[AH:%s:%d]", ah.getName(), ii);
-                router.tell(new Printer.Print(msg, msgId), self()); // long running print op
-            }
-            return true;
-        };
-        reg.applyToAll(func);
-        // send it back to the calling "actor" (or other)
-        sender().tell(new GetAllAccountHoldersOfAllBanksResult(sb.toString()), self());
+    private void printBankBySelection(PrintBankBySelection arg) {
+        getBankBySelection(arg.bankName).forEach(this::printBank);
+    }
+
+    private void printBank(String bName) {
+        String jName = String.format("JT_%s_%s", bName, reg(BankRegistry.class).generateNewId().toString());
+        ActorSelection b = getBank(bName);
+        b.tell(new Bank.Print(getAU().getLocalSystemName(), jName), self());
+    }
+
+    @ActorMessageHandler
+    private void getAllAccountHoldersOfAllBanks(GetAllAccountHolders arg) {
+        sender().tell(this.getAllAccountHoldersOfAllBanksResult(), self());
+    }
+
+    @ActorMessageHandler
+    private void getAllAccountHoldersOfAllBanksDeferred(GetAllAccountHoldersDeferred arg) {
+        initJob(arg);
+        try {
+            inProgressJob(arg);
+            Thread.sleep(arg.getWaitTime() * 1000); // fake processing time
+            updateJobSuccess(arg, getAllAccountHoldersOfAllBanksResult().result());
+        } catch (InterruptedException e) {
+            updateJobFailed(arg);
+            e.printStackTrace();
+        }
     }
 
     @ActorMessageHandler
@@ -119,7 +125,7 @@ public class BankingCentral extends BaseActor {
         printingBC.tell(new BankingCentral.PrintFibonacci(this.sender(), self(), msg), self());
         // Start generating fibs
         self().tell(new BankingCentral.GenerateNextFibonacci(printer, arg.senderRewards, arg.numLoops),
-            self());
+                self());
     }
 
     @ActorMessageHandler
@@ -142,7 +148,7 @@ public class BankingCentral extends BaseActor {
 
         // Reward all the banks in the sender system with points
         IntStream.range(0, arg.senderRewards)
-            .forEach(i -> sender().tell(new RewardBanksInSender(), self()));
+                .forEach(i -> sender().tell(new RewardBanksInSender(), self()));
 
         // Generate the next fib in sequence and pass to random remote system
         rBC.tell(new BankingCentral.GenerateNextFibonacci(arg), self());
@@ -171,31 +177,49 @@ public class BankingCentral extends BaseActor {
     }
 
     @NotNull
-    private List<ActorSelection> getAllLocalBanks() {
+    private AllAccHoldersResult getAllAccountHoldersOfAllBanksResult() {
+        AccountHolderRegistry reg = reg(AccountHolderRegistry.class);
+        final ActorSelection router = getPrinterRouter();
+        StringBuffer sb = new StringBuffer();
+        Function<AccountHolderRegistry.DAccountHolder, Boolean> func = (ah) -> {
+            String msg = String.format("******* AH = [%s] *******", ah.getKey());
+            sb.append(msg); // short op
+            for (int ii = 0; ii < 1; ii++) {// repeat several long running ops
+                String msgId = String.format("JOB:[AH:%s:%d]", ah.getName(), ii);
+                router.tell(new Printer.Print(msg, msgId), self()); // long running print op
+            }
+            return true;
+        };
+        reg.applyToAll(func);
+
+        return new AllAccHoldersResult(sb.toString());
+    }
+
+    @NotNull
+    private List<String> getAllLocalBanks() {
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of local bank names only
         reg(BankRegistry.class).applyToChildrenOfParent(this.getAU().getLocalSystemName(), func);
-        return convertBankNamesToActors(bankNames);
+        return bankNames;
     }
 
     @NotNull
-    private List<ActorSelection> getAllBanks() {
+    private List<String> getAllBanks() {
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of Banks (some of which may be remote).
         reg(BankRegistry.class).applyToAll(func);
-        return convertBankNamesToActors(bankNames);
+        return bankNames;
     }
 
     @NotNull
-    private List<ActorSelection> getBankBySelection(String bankName) {
+    private List<String> getBankBySelection(String bankName) {
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of local banks filtered by the query
-        reg(BankRegistry.class)
-            .applyToFiltered(func, "select_bank", this.getAU().getLocalSystemName(), bankName);
-        return convertBankNamesToActors(bankNames);
+        reg(BankRegistry.class).applyToFiltered(func, "select_bank", this.getAU().getLocalSystemName(), bankName);
+        return bankNames;
     }
 
     @NotNull
@@ -241,7 +265,15 @@ public class BankingCentral extends BaseActor {
     static public class PrintAllAccountNamesInAllBanks {
     }
 
-    static public class PrintAccountStatementOfLocalBanks {
+    static public class PrintLocalBanks {
+    }
+
+    static public class PrintBankByName {
+        String bankName;
+
+        public PrintBankByName(String bankName) {
+            this.bankName = bankName;
+        }
     }
 
     static public class PrintBankBySelection {
@@ -252,16 +284,31 @@ public class BankingCentral extends BaseActor {
         }
     }
 
-    static public class GetAllAccountHoldersOfAllBanks {
+    static public class GetAllAccountHolders {
     }
 
-    static public class GetAllAccountHoldersOfAllBanksResult {
+    static public class GetAllAccountHoldersDeferred extends BasicDeferredMessage<String> {
+        // just for testing out arbitrary processing time
+        // added to the actual request processing time
+        public static final String WAIT_TIME_KEY = "WAIT_TIME_KEY";
+
+        public GetAllAccountHoldersDeferred(IDeferredRequest<String> req) {
+            super(req);
+        }
+
+        public long getWaitTime() {
+            return (long) getArg(WAIT_TIME_KEY);
+        }
+    }
+
+    static public class AllAccHoldersResult {
         private String result;
 
-        public GetAllAccountHoldersOfAllBanksResult(String result) {
+        public AllAccHoldersResult(String result) {
             this.result = result;
         }
 
+        @JsonProperty
         public String result() {
             return this.result;
         }
@@ -304,7 +351,7 @@ public class BankingCentral extends BaseActor {
 
         public PrintFibonacci(ActorRef sender, ActorRef receiver, GenerateNextFibonacci fib) {
             this.msg = String.format("*** Fib:[%s][%d + %d]=[%s][%d] ***",
-                sender, fib.n_1, fib.n, receiver, fib.nFib);
+                    sender, fib.n_1, fib.n, receiver, fib.nFib);
         }
 
         public PrintFibonacci(ActorRef sender, ActorRef receiver, String message) {

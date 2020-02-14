@@ -30,13 +30,13 @@ public class BaseModelQueries<K extends DModel> {
         this.registryModelClass = registryModelClass;
         this.defaultOrderByColumn = defaultOrderByColumn;
         this.reg = new IgniteRegistry<>(
-            rm, this.getCacheConfigKey(),
-            cc -> {
-                // need to set indexed types else the K type table will not be
-                // recognized in Sql Queries.
-                cc.setIndexedTypes(String.class, this.getRegModel());
-                cc.setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-            });
+                rm, this.getCacheConfigKey(),
+                cc -> {
+                    // need to set indexed types else the K type table will not be
+                    // recognized in Sql Queries.
+                    cc.setIndexedTypes(String.class, this.getRegModel());
+                    cc.setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
+                });
     }
 
     /**
@@ -46,7 +46,7 @@ public class BaseModelQueries<K extends DModel> {
         boolean ret = false;
         try (NTxHolder<IgniteProvider.ITx> tx = this.reg.createTx()) {
             String msg = String.format("Broadcast Message [timestamp: %d][%s]", System.currentTimeMillis(),
-                message);
+                    message);
             this.reg.broadcastMessage(msg);
             ret = true;
         } catch (Exception e) {
@@ -97,6 +97,29 @@ public class BaseModelQueries<K extends DModel> {
             return false;
         }
     }
+
+    /**
+     * Removes EVERY object in this registry within an Ignite transaction that passes the function match.
+     * Nested transactions are not supported for now. This
+     * method is synchronized to allow for the presence of mutable variables that might be affected by the
+     * call to func.apply.
+     *
+     * @param parentKey apply the matcher function to the children of this parentKey
+     * @param matcher apply the function to each of the entries in the registry. Return true on match.
+     * @return true if at least one entry was matched. false if NO entry was matched
+     */
+    public void removeChildrenOfParentMatching(String parentKey, Function<K, Boolean> matcher) {
+        try (NTxHolder<IgniteProvider.ITx> tx = this.reg.createTx()) {
+            getAllOfParent(parentKey).forEach(k -> { // get the Model objects
+                if (matcher.apply(k)) { // apply function on the object
+                    reg.remove(k.getKey());
+                }
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
 
     /**
      * Performs the supplied func on the registry object accessed by key within an Ignite transaction. Hence

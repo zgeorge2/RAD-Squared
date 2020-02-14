@@ -5,7 +5,9 @@ import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActorWithRegState;
 import com.rad2.akka.common.RegistryStateDTO;
+import com.rad2.ctrl.deps.IJobRef;
 import com.rad2.apps.bank.ignite.AccountHolderRegistry;
+import com.rad2.apps.bank.akka.AccountHolder.SleepyNoOp;
 import com.rad2.apps.bank.ignite.BankRegistry;
 import com.rad2.common.serialization.IAkkaSerializable;
 import com.rad2.ignite.common.RegistryManager;
@@ -28,20 +30,20 @@ public class Bank extends BaseActorWithRegState {
     @Override
     public Receive createReceive() {
         return super.createReceive()
-            .orElse(receiveBuilder()
-                .match(Print.class, this::print)
-                .match(CreateAccountHolder.class, this::createAccountHolder)
-                .match(GetAllAccountHolders.class, this::getAllAccountHolders)
-                .match(Account.AccrueInterest.class, this::accrueInterest)
-                .match(AccountHolder.AccrueRewardPoints.class, this::accrueRewardPoints)
-                .match(Add.class, this::add)
-                .build());
+                .orElse(receiveBuilder()
+                        .match(Print.class, this::print)
+                        .match(CreateAccountHolder.class, this::createAccountHolder)
+                        .match(GetAllAccountHolders.class, this::getAllAccountHolders)
+                        .match(Account.AccrueInterest.class, this::accrueInterest)
+                        .match(AccountHolder.AccrueRewardPoints.class, this::accrueRewardPoints)
+                        .match(SleepyNoOp.class, this::sleepyNoOp)
+                        .build());
     }
 
     @ActorMessageHandler
     private void print(Print p) {
         this.context().children().foreach(ahActor -> {
-            ahActor.tell(new AccountHolder.Print(), self());
+            ahActor.tell(p, self());
             return true;
         });
     }
@@ -78,26 +80,37 @@ public class Bank extends BaseActorWithRegState {
     }
 
     @ActorMessageHandler
-    private void add(Add add) {
+    private void sleepyNoOp(SleepyNoOp arg) {
         this.context().children().foreach(c -> {
-            c.tell(new AccountHolder.Add(4, 5), self());
+            c.tell(arg, self());
             return true;
         });
-
     }
 
     /**
      * Classes used for received method above.
      */
-    static public class Print implements IAkkaSerializable {
-        public String message;
+    static public class Print implements IAkkaSerializable, IJobRef {
+        String parentKey;
+        String name;
 
         public Print() {
-            this(null);
+            this(null, null);
         }
 
-        public Print(String message) {
-            this.message = message == null ? "<NO MESSAGE>" : message;
+        public Print(String parentKey, String name) {
+            this.parentKey = parentKey;
+            this.name = name;
+        }
+
+        @Override
+        public String getParentKey() {
+            return parentKey;
+        }
+
+        @Override
+        public String getName() {
+            return name;
         }
     }
 
@@ -130,26 +143,6 @@ public class Bank extends BaseActorWithRegState {
                 sb.append(String.format("[%s]; ", ahName));
             });
             return sb.toString();
-        }
-    }
-
-    // Added a fake field to avoid the serializable exception.
-    static public class Add implements IAkkaSerializable{
-        private Long id;
-        public Add() {
-            this(null);
-        }
-
-        public Add(Long id) {
-            this.id = id;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
         }
     }
 }

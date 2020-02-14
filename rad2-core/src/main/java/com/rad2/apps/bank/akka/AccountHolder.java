@@ -6,7 +6,9 @@ import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActorWithRegState;
 import com.rad2.akka.common.RegistryStateDTO;
-import com.rad2.akka.util.JobTracker;
+import com.rad2.apps.bank.akka.Bank.Print;
+import com.rad2.apps.bank.akka.AccountStatement.RequestStatement;
+import com.rad2.apps.bank.akka.Account.AccrueInterest;
 import com.rad2.apps.bank.ignite.AccountHolderRegistry;
 import com.rad2.common.serialization.IAkkaSerializable;
 import com.rad2.common.utils.PrintUtils;
@@ -34,15 +36,15 @@ public class AccountHolder extends BaseActorWithRegState {
     @Override
     public Receive createReceive() {
         return super.createReceive()
-            .orElse(receiveBuilder()
-                .match(SendMoney.class, this::sendMoney)
-                .match(Account.AccrueInterest.class, this::accrueInterest)
-                .match(AccrueRewardPoints.class, this::accrueRewardPoints)
-                .match(CreateAccounts.class, this::createAccounts)
-                .match(AccountStatement.RequestStatement.class, this::requestStatement)
-                .match(Print.class, this::print)
-                .match(Add.class, this::add)
-                .build());
+                .orElse(receiveBuilder()
+                        .match(SendMoney.class, this::sendMoney)
+                        .match(AccrueInterest.class, this::accrueInterest)
+                        .match(AccrueRewardPoints.class, this::accrueRewardPoints)
+                        .match(CreateAccounts.class, this::createAccounts)
+                        .match(RequestStatement.class, this::requestStatement)
+                        .match(Print.class, this::print)
+                        .match(SleepyNoOp.class, this::sleepyNoOp)
+                        .build());
     }
 
     @ActorMessageHandler
@@ -56,12 +58,8 @@ public class AccountHolder extends BaseActorWithRegState {
     private void print(Print p) {
         // create a new statement
         String stmtName = "AH_stmt_" + this.getAHReg().generateNewId();
-        String jtName = "JT_4_" + stmtName;
-        ActorRef jobTracker = this.getAU().add(() -> JobTracker.props(this.getRM(), jtName, this.getRegId(),
-            "PREP_ACCOUNT_STATEMENT"), jtName);
-        ActorRef accStmt = this.add(() -> AccountStatement.props(this.getRM(), jobTracker), stmtName);
-        accStmt.tell(new AccountStatement.BeginStatementPreparation(self(), jobTracker,
-            this.getAllAccounts()), self());
+        ActorRef accStmt = this.add(() -> AccountStatement.props(this.getRM(), p), stmtName);
+        accStmt.tell(new AccountStatement.BeginStatementPreparation(self(), this.getAllAccounts()), self());
     }
 
     @ActorMessageHandler
@@ -70,7 +68,7 @@ public class AccountHolder extends BaseActorWithRegState {
         // parts)
         AccountHolderRegistry.DAccountHolder model = this.getAHReg().get(this.getRegId());
         sender().tell(new AccountStatement.ReceiveStatement(x.requestId, String.format("%n *** %s *** %n",
-            model)), self());
+                model)), self());
     }
 
     @ActorMessageHandler
@@ -78,7 +76,7 @@ public class AccountHolder extends BaseActorWithRegState {
         String transId = this.getAHReg().getTransactionIdForMoneyTransfer(this.getRegId());
         // construct a MT Actor for every MT to be transacted.
         ActorRef mt = this.add(
-            () -> MoneyTransfer.props(this.getRM(), transId, x.amount, x.fromAcc, x.toAcc), transId);
+                () -> MoneyTransfer.props(this.getRM(), transId, x.amount, x.fromAcc, x.toAcc), transId);
         mt.tell(new MoneyTransfer.ValidateAndCompleteTransfer(), self());
     }
 
@@ -93,25 +91,25 @@ public class AccountHolder extends BaseActorWithRegState {
     }
 
     @ActorMessageHandler
-    private void add(Add add) {
+    private void sleepyNoOp(SleepyNoOp arg) {
         try {
-            Thread.sleep(500);
-        } catch(Exception e) {
+            Thread.sleep(arg.getSleepInMillis());
+        } catch (Exception e) {
             PrintUtils.printToActor(e.toString());
         }
-        PrintUtils.printToActor("****** [%s]: [%d] + [%d] = [%d]******", self().path().toString(), add.getA(), add.getB(), add.getB() + add.getA());
+        PrintUtils.printToActor("****** [%s]: [%d] + [%d] = [%d]******", self().path().toString(), arg.getA(), arg.getB(), arg.getB() + arg.getA());
     }
 
     private List<ActorRef> getAllAccountsList() {
         return Account.AccountNameEnum.getAllAccountNames().stream()
-            .map(acName -> this.context().child(acName).get())
-            .collect(Collectors.toList());
+                .map(acName -> this.context().child(acName).get())
+                .collect(Collectors.toList());
     }
 
     private Map<String, ActorRef> getAllAccounts() {
         return Account.AccountNameEnum.getAllAccountNames().stream()
-            .map(acName -> new AbstractMap.SimpleEntry<>(acName, this.context().child(acName).get()))
-            .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+                .map(acName -> new AbstractMap.SimpleEntry<>(acName, this.context().child(acName).get()))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
     /**
@@ -142,16 +140,19 @@ public class AccountHolder extends BaseActorWithRegState {
         }
     }
 
-    static public class Print {
-    }
-
-    static public class Add{
+    static public class SleepyNoOp {
         private int a;
         private int b;
+        private long sleepInMillis;
 
-        public Add(int a, int b) {
+        public SleepyNoOp(int a, int b, long sleepInMillis) {
             this.a = a;
             this.b = b;
+            this.sleepInMillis = sleepInMillis;
+        }
+
+        public long getSleepInMillis() {
+            return sleepInMillis;
         }
 
         public int getA() {
