@@ -1,6 +1,7 @@
 package com.rad2.sb.res;
 
 import com.rad2.akka.common.IDeferredRequest;
+import com.rad2.apps.adm.ignite.JobStatusEnum;
 import com.rad2.ctrl.deps.IJobRef;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -9,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Provides a basic wrapper around a Spring request's args and the DeferredResult object
+ * Provides a basic wrapper around a Spring request's args and the DeferredResult object. Result type is
+ * String for this implementation. Only String results are supported at this time. TODO: extend for non-Strings
  */
 public class DeferredRequest implements IDeferredRequest<String> {
     private static long DEFAULT_TIMEOUT = 2000L;
@@ -21,28 +23,32 @@ public class DeferredRequest implements IDeferredRequest<String> {
         this(DEFAULT_TIMEOUT, ijr);
     }
 
-    public DeferredRequest(long waitTimeForResult, IJobRef ijr) {
+    private DeferredRequest(long waitTimeForResult, IJobRef ijr) {
         argsMap = new HashMap<>();
         result = new DeferredResult<>(waitTimeForResult);
         this.ijr = ijr;
         // set default timeout handling
-        String timeoutMessage = String.format("Request has timed out.\nUse:[/adm/getJobResult/%s]", this.ijr.regId());
+        String timeoutMessage = String.format(JobStatusEnum.JOB_TIMEOUT_FORMAT, this.ijr.regId());
         result.onTimeout(() -> result.setResult(ResponseEntity.ok(timeoutMessage)));
     }
 
     @Override
-    public Object getArg(String key) {
+    public Map<String, Object> args() {
+        return argsMap;
+    }
+
+    @Override
+    public Object arg(String key) {
         return argsMap.get(key);
     }
 
     @Override
-    public IDeferredRequest<String> putArg(String key, Object arg) {
+    public void putArg(String key, Object arg) {
         argsMap.put(key, arg);
-        return this;
     }
 
     @Override
-    public IJobRef getJobRef() {
+    public IJobRef jobRef() {
         return ijr;
     }
 

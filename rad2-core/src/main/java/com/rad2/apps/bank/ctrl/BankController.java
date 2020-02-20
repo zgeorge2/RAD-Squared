@@ -3,8 +3,7 @@ package com.rad2.apps.bank.ctrl;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.rad2.akka.common.AkkaAskAndWait;
-import com.rad2.akka.common.IDeferredRequest;
+import com.rad2.akka.common.IDeferred;
 import com.rad2.apps.bank.akka.Account;
 import com.rad2.apps.bank.akka.AccountHolder;
 import com.rad2.apps.bank.akka.Bank;
@@ -83,57 +82,41 @@ public class BankController extends BaseController {
     }
 
     public void accrueMonthlyBankInterestInLocalBanks() {
-        this.getBankingCentral().tell(new BankingCentral.AccrueMonthlyBankInterestInLocalBanks(),
-                ActorRef.noSender());
+        getBankingCentral().tell(new BankingCentral.AccrueMonthlyBankInterestInLocalBanks(), ActorRef.noSender());
     }
 
-    public String getAllAccountHoldersFromBank(String bankName) {
-        ActorSelection bank = this.getBank(bankName);
-        AkkaAskAndWait<Bank.GetAllAccountHolders, Bank.GetAllAccountHoldersResult> ask =
-                new AkkaAskAndWait<>(bank);
-        Bank.GetAllAccountHoldersResult ret = ask.askAndWait(new Bank.GetAllAccountHolders(), 10);
-        return ret.toString();
+    public void getAllAccountHoldersFromBank(IDeferred<String> req) {
+        getBankingCentral().tell(new Bank.GetAllAccountHolders(req), ActorRef.noSender());
     }
 
-    public String getAllAccountHolders() {
-        AkkaAskAndWait<BankingCentral.GetAllAccountHolders,
-                BankingCentral.AllAccHoldersResult> ask =
-                new AkkaAskAndWait<>(this.getBankingCentral());
-        BankingCentral.AllAccHoldersResult ret =
-                ask.askAndWait(new BankingCentral.GetAllAccountHolders(), 10);
-        return ret.result();
+    public void getAllAccountHolders(IDeferred<String> req) {
+        getBankingCentral().tell(new BankingCentral.GetAllAccountHolders(req), ActorRef.noSender());
     }
 
-    public void getAllAccountHoldersDeferred(IDeferredRequest<String> req) {
-        this.getBankingCentral().tell(new BankingCentral.GetAllAccountHoldersDeferred(req), ActorRef.noSender());
-    }
-
-    public void printAllAccountNamesInAllBanks() {
-        this.getBankingCentral().tell(new BankingCentral.PrintAllAccountNamesInAllBanks(),
-                ActorRef.noSender());
-    }
-
-    public void printBanksByCount(BankCountCollectionDTO bcColl) {
+    public void printBanksByCount(IDeferred<String> req) {
+        BankCountCollectionDTO bcColl = (BankCountCollectionDTO) req.arg(BankCountCollectionDTO.BC_COLL_KEY);
         if (bcColl == null) {
             return;
         }
         bcColl.getBCs().forEach(bc -> {
             IntStream.range(0, bc.getCount()).forEach(i -> {
-                printBankByName(bc.getBankName());
+                IDeferred<String> bReq = new BankingCentral.PrintBankByName(req);
+                bReq.putArg(BankingCentral.PrintBankByName.BANK_NAME_KEY, bc.getBankName());
+                printBankByName(bReq);
             });
         });
     }
 
-    public void printLocalBanks() {
-        this.getBankingCentral().tell(new BankingCentral.PrintLocalBanks(), ActorRef.noSender());
+    public void printLocalBanks(IDeferred<String> req) {
+        this.getBankingCentral().tell(new BankingCentral.PrintLocalBanks(req), ActorRef.noSender());
     }
 
-    public void printBankBySelection(String bankName) {
-        this.getBankingCentral().tell(new BankingCentral.PrintBankBySelection(bankName), ActorRef.noSender());
+    public void printBankByName(IDeferred<String> req) {
+        this.getBankingCentral().tell(new BankingCentral.PrintBankByName(req), ActorRef.noSender());
     }
 
-    public void printBankByName(String bankName) {
-        this.getBankingCentral().tell(new BankingCentral.PrintBankByName(bankName), ActorRef.noSender());
+    public void printBankBySelection(IDeferred<String> req) {
+        this.getBankingCentral().tell(new BankingCentral.PrintBankBySelection(req), ActorRef.noSender());
     }
 
     public String broadcastMessage(String message) {
@@ -247,6 +230,7 @@ public class BankController extends BaseController {
     }
 
     public static class BankCountCollectionDTO {
+        public static final String BC_COLL_KEY = "BC_COLL_KEY";
         List<BankCountDTO> bcs;
 
         public List<BankCountDTO> getBCs() {

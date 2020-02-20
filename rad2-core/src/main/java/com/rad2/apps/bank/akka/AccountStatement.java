@@ -66,7 +66,7 @@ public class AccountStatement extends BaseActorWithTimer {
         StringBuilder sb = new StringBuilder();
         sb.append(this.accountHolderStatement);
         this.accountStatements.values().forEach(sb::append);
-        updateJobSuccess(getJobRef(), sb.toString());
+        updateJobSuccess(jobRef(), sb.toString());
     }
 
     @ActorMessageHandler
@@ -76,13 +76,10 @@ public class AccountStatement extends BaseActorWithTimer {
         } else {
             this.accountStatements.put(x.requestId, x.statement);
         }
-        inProgressJob(getJobRef());
     }
 
     @ActorMessageHandler
     private void beginStatementPreparation(BeginStatementPreparation data) {
-        // meter the progress in the job tracker - init it
-        initJob(getJobRef());
         // send this AccountStatement to AH to fill up
         data.ah.tell(new AccountStatement.RequestStatement(AH_KEY), self());
         // for each Account, send this AccountStatement to it to fill up
@@ -91,7 +88,7 @@ public class AccountStatement extends BaseActorWithTimer {
                         self()));
     }
 
-    private IJobRef getJobRef() {
+    private IJobRef jobRef() {
         return this.jr;
     }
 

@@ -62,11 +62,13 @@ public class SystemProperties extends RegistryStateDTO {
 
     public List<String> getIgniteMachines() {
         return this.config.getList(IGNITE_MACHINE_ADDRESS_PROP).stream()
-            .map(configValue -> (String) configValue.unwrapped())
-            .collect(Collectors.toList());
+                .map(configValue -> (String) configValue.unwrapped())
+                .collect(Collectors.toList());
     }
 
-    public String getDiscoveryMode() { return this.config.getString(DISCOVERY_MODE_PROP); }
+    public String getDiscoveryMode() {
+        return this.config.getString(DISCOVERY_MODE_PROP);
+    }
 
     public Config getRawConfig() {
         return this.config;
@@ -83,9 +85,9 @@ public class SystemProperties extends RegistryStateDTO {
         for (ConfigValue cv : cl) {
             Config c = ((ConfigObject) cv).toConfig();
             iq.addQuery(
-                c.getString(IGNITE_QUERY_MODEL_PROP),
-                c.getString(IGNITE_QUERY_NAME_PROP),
-                c.getString(IGNITE_QUERY_TEMPLATE_PROP));
+                    c.getString(IGNITE_QUERY_MODEL_PROP),
+                    c.getString(IGNITE_QUERY_NAME_PROP),
+                    c.getString(IGNITE_QUERY_TEMPLATE_PROP));
         }
         return iq;
     }

@@ -3,13 +3,12 @@ package com.rad2.apps.bank.akka;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.Props;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActor;
 import com.rad2.akka.common.BasicDeferredMessage;
-import com.rad2.akka.common.IDeferredRequest;
+import com.rad2.akka.common.IDeferred;
+import com.rad2.apps.bank.akka.Bank.GetAllAccountHoldersResult;
 import com.rad2.apps.bank.ignite.AccountHolderRegistry;
-import com.rad2.apps.bank.ignite.AccountRegistry;
 import com.rad2.apps.bank.ignite.BankRegistry;
 import com.rad2.common.serialization.IAkkaSerializable;
 import com.rad2.common.utils.PrintUtils;
@@ -40,12 +39,11 @@ public class BankingCentral extends BaseActor {
                         .match(AccrueMonthlyBankInterestInLocalBanks.class,
                                 this::accrueMonthlyBankInterestInLocalBanks)
                         .match(RewardBanksInSender.class, this::rewardBanksInSender)
-                        .match(PrintAllAccountNamesInAllBanks.class, this::printAllAccountNamesInAllBanks)
                         .match(PrintLocalBanks.class, this::printLocalBanks)
                         .match(PrintBankBySelection.class, this::printBankBySelection)
                         .match(PrintBankByName.class, this::printBankByName)
                         .match(GetAllAccountHolders.class, this::getAllAccountHoldersOfAllBanks)
-                        .match(GetAllAccountHoldersDeferred.class, this::getAllAccountHoldersOfAllBanksDeferred)
+                        .match(Bank.GetAllAccountHolders.class, this::getAllAccountHoldersOfBank)
                         .match(InitiateFibonacci.class, this::initiateFibonacci)
                         .match(GenerateNextFibonacci.class, this::generateNextFibonacci)
                         .match(PrintFibonacci.class, this::printFibonacci)
@@ -67,49 +65,42 @@ public class BankingCentral extends BaseActor {
     }
 
     @ActorMessageHandler
-    private void printAllAccountNamesInAllBanks(PrintAllAccountNamesInAllBanks arg) {
-        AccountRegistry reg = reg(AccountRegistry.class);
-        final ActorSelection router = getPrinterRouter();
-        Function<AccountRegistry.DAccount, Boolean> func = (AccountRegistry.DAccount d) -> {
-            router.tell(new Printer.Print(d.getKey(), d.getKey()), self());
-            return true;
-        };
-        reg.applyToAll(func);
-    }
-
-    @ActorMessageHandler
     private void printLocalBanks(PrintLocalBanks arg) {
-        getAllLocalBanks().forEach(this::printBank);
+        getAllLocalBanks().forEach(bn -> {
+            Bank.BankRequest req = new Bank.BankRequest(arg);
+            req.putArg(Bank.BankRequest.BANK_NAME_KEY, bn);
+            printBank(req);
+        });
     }
 
     @ActorMessageHandler
     private void printBankByName(PrintBankByName arg) {
-        this.printBank(arg.bankName);
+        printBank(arg);
     }
 
     @ActorMessageHandler
     private void printBankBySelection(PrintBankBySelection arg) {
-        getBankBySelection(arg.bankName).forEach(this::printBank);
+        getBankBySelection(arg.bankName()).forEach(bn -> {
+            Bank.BankRequest req = new Bank.BankRequest(arg);
+            req.putArg(Bank.BankRequest.BANK_NAME_KEY, bn);
+            printBank(req);
+        });
     }
 
-    private void printBank(String bName) {
-        String jName = String.format("JT_%s_%s", bName, reg(BankRegistry.class).generateNewId().toString());
-        ActorSelection b = getBank(bName);
-        b.tell(new Bank.Print(getAU().getLocalSystemName(), jName), self());
+    private void printBank(Bank.BankRequest arg) {
+        getBank(arg.bankName()).tell(new Bank.Print(arg), self());
+    }
+
+    @ActorMessageHandler
+    private void getAllAccountHoldersOfBank(Bank.GetAllAccountHolders arg) {
+        getBank(arg.bankName()).tell(arg, self());
     }
 
     @ActorMessageHandler
     private void getAllAccountHoldersOfAllBanks(GetAllAccountHolders arg) {
-        sender().tell(this.getAllAccountHoldersOfAllBanksResult(), self());
-    }
-
-    @ActorMessageHandler
-    private void getAllAccountHoldersOfAllBanksDeferred(GetAllAccountHoldersDeferred arg) {
-        initJob(arg);
         try {
-            inProgressJob(arg);
             Thread.sleep(arg.getWaitTime() * 1000); // fake processing time
-            updateJobSuccess(arg, getAllAccountHoldersOfAllBanksResult().result());
+            updateJobSuccess(arg, getAllAccountHoldersOfAllBanksResult().toString());
         } catch (InterruptedException e) {
             updateJobFailed(arg);
             e.printStackTrace();
@@ -145,7 +136,6 @@ public class BankingCentral extends BaseActor {
             printingBC.tell(new BankingCentral.PrintFibonacci(this.sender(), self(), msg), self());
             return;
         }
-
         // Reward all the banks in the sender system with points
         IntStream.range(0, arg.senderRewards)
                 .forEach(i -> sender().tell(new RewardBanksInSender(), self()));
@@ -177,48 +167,50 @@ public class BankingCentral extends BaseActor {
     }
 
     @NotNull
-    private AllAccHoldersResult getAllAccountHoldersOfAllBanksResult() {
-        AccountHolderRegistry reg = reg(AccountHolderRegistry.class);
-        final ActorSelection router = getPrinterRouter();
-        StringBuffer sb = new StringBuffer();
+    private GetAllAccountHoldersResult getAllAccountHoldersOfAllBanksResult() {
+        AccountHolderRegistry ahr = reg(AccountHolderRegistry.class);
+        GetAllAccountHoldersResult ret = new GetAllAccountHoldersResult();
         Function<AccountHolderRegistry.DAccountHolder, Boolean> func = (ah) -> {
-            String msg = String.format("******* AH = [%s] *******", ah.getKey());
-            sb.append(msg); // short op
-            for (int ii = 0; ii < 1; ii++) {// repeat several long running ops
-                String msgId = String.format("JOB:[AH:%s:%d]", ah.getName(), ii);
-                router.tell(new Printer.Print(msg, msgId), self()); // long running print op
-            }
+            ret.add(ah.getName());
             return true;
         };
-        reg.applyToAll(func);
+        ahr.applyToAll(func);
 
-        return new AllAccHoldersResult(sb.toString());
+        return ret;
     }
 
     @NotNull
     private List<String> getAllLocalBanks() {
+        BankRegistry br = reg(BankRegistry.class);
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of local bank names only
-        reg(BankRegistry.class).applyToChildrenOfParent(this.getAU().getLocalSystemName(), func);
+        br.applyToChildrenOfParent(this.getAU().getLocalSystemName(), func);
         return bankNames;
     }
 
     @NotNull
     private List<String> getAllBanks() {
+        BankRegistry br = reg(BankRegistry.class);
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of Banks (some of which may be remote).
-        reg(BankRegistry.class).applyToAll(func);
+        br.applyToAll(func);
         return bankNames;
     }
 
     @NotNull
+    private ActorSelection getBank(String bankName) {
+        return getAU().getActorNamed(bankName);
+    }
+
+    @NotNull
     private List<String> getBankBySelection(String bankName) {
+        BankRegistry br = reg(BankRegistry.class);
         List<String> bankNames = new ArrayList<>();
         Function<BankRegistry.DBank, Boolean> func = banksSelectorFunction(bankNames);
         // get the list of local banks filtered by the query
-        reg(BankRegistry.class).applyToFiltered(func, "select_bank", this.getAU().getLocalSystemName(), bankName);
+        br.applyToFiltered(func, "select_bank", this.getAU().getLocalSystemName(), bankName);
         return bankNames;
     }
 
@@ -231,17 +223,9 @@ public class BankingCentral extends BaseActor {
     }
 
     @NotNull
-    private List<ActorSelection> convertBankNamesToActors(List<String> bankNames) {
+    private List<ActorSelection> convert(List<String> bankNames) {
         // convert to Actors
         return bankNames.stream().map(this::getBank).collect(Collectors.toList());
-    }
-
-    private ActorSelection getBank(String bankName) {
-        return getAU().getActorNamed(bankName);
-    }
-
-    public ActorSelection getPrinterRouter() {
-        return getAU().getActor(getAU().getLocalSystemName(), Printer.PRINTER_MASTER_ROUTER_NAME);
     }
 
     /**
@@ -262,55 +246,33 @@ public class BankingCentral extends BaseActor {
         }
     }
 
-    static public class PrintAllAccountNamesInAllBanks {
-    }
-
-    static public class PrintLocalBanks {
-    }
-
-    static public class PrintBankByName {
-        String bankName;
-
-        public PrintBankByName(String bankName) {
-            this.bankName = bankName;
+    static public class PrintLocalBanks extends BasicDeferredMessage<String> {
+        public PrintLocalBanks(IDeferred<String> req) {
+            super(req);
         }
     }
 
-    static public class PrintBankBySelection {
-        String bankName;
-
-        public PrintBankBySelection(String bankName) {
-            this.bankName = bankName;
+    static public class PrintBankBySelection extends Bank.BankRequest {
+        public PrintBankBySelection(IDeferred<String> req) {
+            super(req);
         }
     }
 
-    static public class GetAllAccountHolders {
+    static public class PrintBankByName extends Bank.BankRequest {
+        public PrintBankByName(IDeferred<String> req) {
+            super(req);
+        }
     }
 
-    static public class GetAllAccountHoldersDeferred extends BasicDeferredMessage<String> {
-        // just for testing out arbitrary processing time
-        // added to the actual request processing time
-        public static final String WAIT_TIME_KEY = "WAIT_TIME_KEY";
+    static public class GetAllAccountHolders extends BasicDeferredMessage<String> {
+        public static final String WAIT_TIME_KEY = "WAIT_TIME_KEY";// just for testing out arbitrary processing time
 
-        public GetAllAccountHoldersDeferred(IDeferredRequest<String> req) {
+        public GetAllAccountHolders(IDeferred<String> req) {
             super(req);
         }
 
         public long getWaitTime() {
-            return (long) getArg(WAIT_TIME_KEY);
-        }
-    }
-
-    static public class AllAccHoldersResult {
-        private String result;
-
-        public AllAccHoldersResult(String result) {
-            this.result = result;
-        }
-
-        @JsonProperty
-        public String result() {
-            return this.result;
+            return (long) arg(WAIT_TIME_KEY);
         }
     }
 

@@ -19,5 +19,9 @@ public class JobRefFactory implements ControllerDependency {
         String name = "JT_" + UUID.randomUUID();
         return new JobRef(rm.getAU().getLocalSystemName(), name);
     }
+
+    public IJobRef create(String parentKey, String name) {
+        return new JobRef(parentKey, name);
+    }
 }
 

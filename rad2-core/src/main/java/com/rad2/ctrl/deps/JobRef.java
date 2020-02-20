@@ -1,8 +1,14 @@
 package com.rad2.ctrl.deps;
 
-public class JobRef implements IJobRef {
+import com.rad2.common.serialization.IAkkaSerializable;
+
+public class JobRef implements IJobRef, IAkkaSerializable {
     private String name; // the name of the job
     private String parentKey; // made unique, typically by the local system name
+
+    public JobRef() {
+        this(null, null);
+    }
 
     public JobRef(IJobRef ijr) {
         this(ijr.getParentKey(), ijr.getName());

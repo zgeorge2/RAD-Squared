@@ -4,12 +4,12 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActorWithRegState;
+import com.rad2.akka.common.BasicDeferredMessage;
+import com.rad2.akka.common.IDeferred;
 import com.rad2.akka.common.RegistryStateDTO;
-import com.rad2.ctrl.deps.IJobRef;
-import com.rad2.apps.bank.ignite.AccountHolderRegistry;
 import com.rad2.apps.bank.akka.AccountHolder.SleepyNoOp;
+import com.rad2.apps.bank.ignite.AccountHolderRegistry;
 import com.rad2.apps.bank.ignite.BankRegistry;
-import com.rad2.common.serialization.IAkkaSerializable;
 import com.rad2.ignite.common.RegistryManager;
 
 import java.util.ArrayList;
@@ -65,11 +65,11 @@ public class Bank extends BaseActorWithRegState {
     }
 
     @ActorMessageHandler
-    private void getAllAccountHolders(GetAllAccountHolders i) {
+    private void getAllAccountHolders(GetAllAccountHolders arg) {
         AccountHolderRegistry ahReg = reg(AccountHolderRegistry.class);
         GetAllAccountHoldersResult ret = new GetAllAccountHoldersResult();
-        ahReg.applyToChildrenOfParent(this.getRegId(), ah -> ret.add(ah.getName()));
-        sender().tell(ret, self()); // send it back to the calling "actor" (or other)
+        ahReg.applyToChildrenOfParent(getRegId(), ah -> ret.add(ah.getName()));
+        updateJobSuccess(arg, ret.toString());
     }
 
     @ActorMessageHandler
@@ -90,30 +90,6 @@ public class Bank extends BaseActorWithRegState {
     /**
      * Classes used for received method above.
      */
-    static public class Print implements IAkkaSerializable, IJobRef {
-        String parentKey;
-        String name;
-
-        public Print() {
-            this(null, null);
-        }
-
-        public Print(String parentKey, String name) {
-            this.parentKey = parentKey;
-            this.name = name;
-        }
-
-        @Override
-        public String getParentKey() {
-            return parentKey;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-
     static public class CreateAccountHolder {
         public String accountHolderName;
 
@@ -122,7 +98,33 @@ public class Bank extends BaseActorWithRegState {
         }
     }
 
-    static public class GetAllAccountHolders {
+    static public class BankRequest extends BasicDeferredMessage<String> {
+        public static final String BANK_NAME_KEY = "BANK_NAME_KEY";
+
+        public BankRequest(IDeferred<String> req) {
+            super(req);
+        }
+
+        public String bankName() {
+            return (String) arg(BANK_NAME_KEY);
+        }
+    }
+
+    static public class Print extends BankRequest {
+        public Print(IDeferred<String> req) {
+            super(req);
+        }
+
+        public Print() {
+            super(null);
+        }
+    }
+
+    static public class GetAllAccountHolders extends BankRequest {
+        public GetAllAccountHolders(IDeferred<String> req) {
+            super(req);
+        }
+
     }
 
     static public class GetAllAccountHoldersResult {
@@ -140,7 +142,7 @@ public class Bank extends BaseActorWithRegState {
         public String toString() {
             StringBuffer sb = new StringBuffer();
             this.accountHolderNames.forEach(ahName -> {
-                sb.append(String.format("[%s]; ", ahName));
+                sb.append(String.format("******* AH = [%s] *******", ahName));
             });
             return sb.toString();
         }

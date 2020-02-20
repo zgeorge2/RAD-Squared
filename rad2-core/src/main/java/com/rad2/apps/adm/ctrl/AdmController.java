@@ -3,9 +3,7 @@ package com.rad2.apps.adm.ctrl;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.rad2.akka.common.IDeferredRequest;
 import com.rad2.akka.router.MasterRouter;
-import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.apps.adm.akka.NodeAdmin;
 import com.rad2.ctrl.BaseController;
 
@@ -17,10 +15,6 @@ import java.util.List;
  * functions here.
  */
 public class AdmController extends BaseController {
-    public void getJobResult(IDeferredRequest<String> req) {
-        getJobRouter().tell(new JobTrackerWorker.GetJobResult(req), ActorRef.noSender());
-    }
-
     public void shutdown() {
         this.getNodeAdmin().tell(new NodeAdmin.ShutdownNode(true), ActorRef.noSender());
     }
@@ -42,14 +36,6 @@ public class AdmController extends BaseController {
         List<Class> ret = new ArrayList<>();
         ret.add(AdmAppInitializer.class);
         return ret;
-    }
-
-    private ActorSelection getRouter(String systemName, String routerName) {
-        return getAU().getActor(systemName, routerName);
-    }
-
-    private ActorSelection getJobRouter() {
-        return getRouter(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
     }
 
     public static class UpdateRouteesDTO {

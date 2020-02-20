@@ -1,6 +1,10 @@
 package com.rad2.ctrl;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import com.rad2.akka.common.AkkaActorSystemUtility;
+import com.rad2.akka.common.IDeferred;
+import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ctrl.deps.IFakeControllerDependency;
 import com.rad2.ctrl.deps.IJobRef;
@@ -12,6 +16,7 @@ import com.rad2.ignite.common.UsesRegistryManager;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,12 +61,36 @@ abstract public class BaseController implements ControllerDependencyListProvider
         return rm;
     }
 
+    protected ActorSelection getRouter(String systemName, String routerName) {
+        return getAU().getActor(systemName, routerName);
+    }
+
     public IJobRef createJobRef() {
         return getJobRefFactory().create();
     }
 
+    public IJobRef createJobRef(String parentKey, String name) {
+        return getJobRefFactory().create(parentKey, name);
+    }
+
     private JobRefFactory getJobRefFactory() {
         return this.getDep(JobRefFactory.class);
+    }
+
+    protected ActorSelection getJobRouter() {
+        return getRouter(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
+    }
+
+    public void initJob(IDeferred<String> arg, Consumer<String> cons, Consumer<IDeferred<String>> nextStep) {
+        getJobRouter().tell(new JobTrackerWorker.InitJob(arg, cons, nextStep), ActorRef.noSender());
+    }
+
+    public void initJobRetrieval(IDeferred<String> arg, Consumer<String> cons, Consumer<IDeferred<String>> nextStep) {
+        getJobRouter().tell(new JobTrackerWorker.InitJobRetrieval(arg, cons, nextStep), ActorRef.noSender());
+    }
+
+    public void getJobResult(IDeferred<String> req) {
+        getJobRouter().tell(new JobTrackerWorker.GetResult(req), ActorRef.noSender());
     }
 
     private IFakeControllerDependency getFakeControllerDependency() {

@@ -1,15 +1,14 @@
 package com.rad2.sb.apps.bank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rad2.apps.bank.akka.Bank;
 import com.rad2.apps.bank.akka.BankingCentral;
 import com.rad2.apps.bank.ctrl.BankController;
+import com.rad2.apps.bank.ctrl.BankController.BankCountCollectionDTO;
 import com.rad2.sb.res.BaseResource;
-import com.rad2.sb.res.DeferredRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
-
-import java.util.concurrent.Callable;
 
 /**
  * The BankResource provides REST resources for use by external entities. This class, thus, provides the REST
@@ -45,84 +44,66 @@ public class BankResource extends BaseResource<BankController> {
         return new PrintOut(String.format("Create banks: /[%s]", banks));
     }
 
-    @GetMapping("")
-    public PrintOut printAccountStatementsOfLocalBanks() {
-        logger.info("GET /bank");
-        this.getC().printLocalBanks();
-        return new PrintOut("PrintAccountStatementsOfLocalBanks");
-    }
-
-    @PostMapping("printAccountStatementByCount")
-    public PrintOut printAccountStatementByCount(@RequestBody BankController.BankCountCollectionDTO bcList) {
-        logger.info("GET /printAccountStatementByCount");
-        this.getC().printBanksByCount(bcList);
-        return new PrintOut("printAccountStatementByCount");
-    }
-
-    @GetMapping("/{bn}")
-    public PrintOut printAccountStatementOfBank(@PathVariable("bn") String bn) {
-        logger.info(String.format("GET /bank/{%s}", bn));
-        this.getC().printBankByName(bn);
-        return new PrintOut(String.format("PrintAccountStatementOfBank : /[%s]", bn));
-    }
-
-    @GetMapping("/{bn}/printBankBySelection")
-    public PrintOut printBankBySelection(@PathVariable("bn") String bn) {
-        logger.info(String.format("GET /bank/{%s}/printBankBySelection", bn));
-        this.getC().printBankBySelection(bn);
-        return new PrintOut(String.format("PrintBankBySelection: [%s]", bn));
-    }
-
     @PutMapping("/{bn}/accountHolder/{ah}")
     public PrintOut addAccountHolder(@PathVariable("bn") String bn,
                                      @PathVariable("ah") String ah) {
         logger.info(String.format("PUT /bank/{%s}/accountHolder/{%s}", bn, ah));
-        this.getC().addAccountHolder(bn, ah);
+        getC().addAccountHolder(bn, ah);
         return new PrintOut(String.format("Create fromAH: /[%s]/[%s]", bn, ah));
     }
 
     @PostMapping("/accrueInterest")
     public PrintOut accrueInterestInAllAccounts() {
         logger.info("POST /bank/accrueInterest");
-        this.getC().accrueMonthlyBankInterestInLocalBanks();
+        getC().accrueMonthlyBankInterestInLocalBanks();
         return new PrintOut("Accrue Interest in accounts");
     }
 
-    @GetMapping("/printAccountsList")
-    public PrintOut printAllAccountNamesInAllBanks() {
-        logger.info("POST /printAccountsList");
-        this.getC().printAllAccountNamesInAllBanks();
-        return new PrintOut("Print all account names");
+    @PostMapping("printBanksByCount")
+    public DeferredResult<ResponseEntity<String>> printBanksByCount(@RequestBody BankCountCollectionDTO bcList) {
+        logger.info("POST /bank/printBanksByCount");
+        return createRequest(req -> req.putArg(BankCountCollectionDTO.BC_COLL_KEY, bcList),
+                req -> getC().printBanksByCount(req));
     }
 
-    @GetMapping("/getAllAccountHolders")
-    public Callable<ResponseEntity<PrintOut>> getAllAccountHolders() {
-        logger.info("GET getAllAccountHoldersOfAllBanks");
-        return () -> ResponseEntity.ok(new PrintOut(this.getC().getAllAccountHolders()));
+    @GetMapping("")
+    public DeferredResult<ResponseEntity<String>> printLocalBanks() {
+        logger.info("GET /bank");
+        return createRequest(req -> getC().printLocalBanks(req));
     }
 
-    @GetMapping("/getAllAccHoldersDeferred/{waitTime}")
-    public DeferredResult<ResponseEntity<String>> getAllAccHoldersDeferred(@PathVariable long waitTime) {
-        logger.info("GET getAllAccHoldersDeferred");
-        DeferredRequest req = new DeferredRequest(getC().createJobRef());
-        req.putArg(BankingCentral.GetAllAccountHoldersDeferred.WAIT_TIME_KEY, waitTime);
-        this.getC().getAllAccountHoldersDeferred(req);
-        logger.info("Returning from GET getAllAccHoldersDeferred");
-        // return the deferred result (NOT the actual one, that comes later, hopefully)
-        return req.getResult();
+    @GetMapping("/{bn}")
+    public DeferredResult<ResponseEntity<String>> printBankByName(@PathVariable("bn") String bn) {
+        logger.info(String.format("GET /bank/{%s}", bn));
+        return createRequest(req -> req.putArg(BankingCentral.PrintBankByName.BANK_NAME_KEY, bn),
+                req -> getC().printBankByName(req));
+    }
+
+    @GetMapping("/{bn}/printBankBySelection")
+    public DeferredResult<ResponseEntity<String>> printBankBySelection(@PathVariable("bn") String bn) {
+        logger.info(String.format("GET /bank/{%s}/printBankBySelection", bn));
+        return createRequest(req -> req.putArg(BankingCentral.PrintBankBySelection.BANK_NAME_KEY, bn),
+                req -> getC().printBankBySelection(req));
+    }
+
+    @GetMapping("/getAllAccountHolders/{waitTime}")
+    public DeferredResult<ResponseEntity<String>> getAllAccountHolders(@PathVariable long waitTime) {
+        logger.info(String.format("GET /bank/getAllAccountHoldersOfBank/{%d}", waitTime));
+        return createRequest(req -> req.putArg(BankingCentral.GetAllAccountHolders.WAIT_TIME_KEY, waitTime),
+                req -> getC().getAllAccountHolders(req));
     }
 
     @GetMapping("/{bn}/getAllAccountHolders")
-    public PrintOut getAllAccountHoldersFromBank(@PathVariable("bn") String bn) {
+    public DeferredResult<ResponseEntity<String>> getAllAccountHoldersFromBank(@PathVariable("bn") String bn) {
         logger.info(String.format("GET /bank/{%s}/getAllAccountHoldersOfBank", bn));
-        String ret = this.getC().getAllAccountHoldersFromBank(bn);
-        return new PrintOut(String.format("Account Holders : %s", ret));
+        return createRequest(req -> req.putArg(Bank.GetAllAccountHolders.BANK_NAME_KEY, bn),
+                req -> getC().getAllAccountHoldersFromBank(req));
     }
 
     @PostMapping("/doSleepyNoOp")
     public PrintOut doSleepyNoOp(@RequestBody BankController.BankCountCollectionDTO requiredStatements) {
         logger.info("POST /doSleepyNoOp");
-        this.getC().doSleepyNoOp(requiredStatements);
+        getC().doSleepyNoOp(requiredStatements);
         return new PrintOut("Doing a whole lot of nothing sleepily in AccountHolders");
     }
 

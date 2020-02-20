@@ -1,21 +1,13 @@
 package com.rad2.akka.common;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.ActorSelection;
-import akka.actor.Props;
-import com.rad2.akka.aspects.ActorMessageHandler;
-import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ignite.common.RegistryManager;
-import com.rad2.ignite.common.UsesRegistryManager;
-
-import java.util.function.Supplier;
 
 /**
  * This is the minimalistic combination in this module. It is an AbstractActor, and uses a RegistryManager
  */
-public abstract class BaseActor extends AbstractActor implements UsesRegistryManager, IJobWorkerClient {
+public abstract class BaseActor extends AbstractActor implements IJobWorkerClient {
     private RegistryManager rm;
 
     protected BaseActor(RegistryManager rm) {
@@ -25,59 +17,24 @@ public abstract class BaseActor extends AbstractActor implements UsesRegistryMan
     }
 
     @Override
-    /**
-     * Override in child class but attach to this createReceive
-     */
     public Receive createReceive() {
-        return receiveBuilder()
-                .match(CreateChild.class, this::createChild)
-                .match(Terminate.class, this::terminate)
-                .build();
-    }
-
-    @ActorMessageHandler
-    private ActorRef createChild(CreateChild args) {
-        return this.add(args.childPropsSupplier, args.childName);
-    }
-
-    /**
-     * Terminate this timer actor
-     */
-    @ActorMessageHandler
-    private final void terminate(Terminate t) {
-        this.context().stop(self());
-    }
-
-    protected final ActorRef add(Supplier<Props> propsSupplier, String name) {
-        return this.getAU().add(this.getContext(), propsSupplier, name);
+        return IJobWorkerClient.super.createReceive()
+                .orElse(receiveBuilder()
+                        .match(Ping.class, this::ping)
+                        .build());
     }
 
     public final RegistryManager getRM() {
         return this.rm;
     }
 
-    public final AkkaActorSystemUtility getAU() {
-        return this.getRM().getAU();
-    }
-
-    public ActorSelection getJR() {
-        return getAU().getActor(getAU().getLocalSystemName(), JobTrackerWorker.JOB_TRACKER_MASTER_ROUTER);
+    private void ping(Ping arg) {
     }
 
     /**
-     * Classes used for received method above.
+     * Messages specific to BaseActor
      */
-    public static class CreateChild {
-        public Supplier<Props> childPropsSupplier;
-        public String childName;
-
-        public CreateChild(Supplier<Props> childPropsSupplier, String childName) {
-            this.childPropsSupplier = childPropsSupplier;
-            this.childName = childName;
-        }
-    }
-
-    static public class Terminate {
+    public static class Ping {
     }
 }
 

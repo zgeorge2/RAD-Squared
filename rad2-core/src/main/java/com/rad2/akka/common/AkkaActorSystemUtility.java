@@ -92,7 +92,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
             ret = this.add(propsSupplier, actorName); // this is to be added via ActorSystem
         } else {
             // needs to be added using context of the parent actor
-            actorParent.tell(new BaseActor.CreateChild(propsSupplier, actorName), ActorRef.noSender());
+            actorParent.tell(new ExtendedActorBehavior.CreateChild(propsSupplier, actorName), ActorRef.noSender());
             // wait for the creation of the actor to happen. THis is NOT guaranteed. It may timeout
             // and creation may continue in background.
             ret = this.resolveActor(actorPath); // Todo: Need to revisit background Actor creation

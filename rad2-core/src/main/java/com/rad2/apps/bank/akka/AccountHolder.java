@@ -6,9 +6,9 @@ import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActorWithRegState;
 import com.rad2.akka.common.RegistryStateDTO;
-import com.rad2.apps.bank.akka.Bank.Print;
-import com.rad2.apps.bank.akka.AccountStatement.RequestStatement;
 import com.rad2.apps.bank.akka.Account.AccrueInterest;
+import com.rad2.apps.bank.akka.AccountStatement.RequestStatement;
+import com.rad2.apps.bank.akka.Bank.Print;
 import com.rad2.apps.bank.ignite.AccountHolderRegistry;
 import com.rad2.common.serialization.IAkkaSerializable;
 import com.rad2.common.utils.PrintUtils;
@@ -58,7 +58,7 @@ public class AccountHolder extends BaseActorWithRegState {
     private void print(Print p) {
         // create a new statement
         String stmtName = "AH_stmt_" + this.getAHReg().generateNewId();
-        ActorRef accStmt = this.add(() -> AccountStatement.props(this.getRM(), p), stmtName);
+        ActorRef accStmt = this.add(() -> AccountStatement.props(this.getRM(), p.jobRef()), stmtName);
         accStmt.tell(new AccountStatement.BeginStatementPreparation(self(), this.getAllAccounts()), self());
     }
 

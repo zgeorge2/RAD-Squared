@@ -2,13 +2,13 @@ package com.rad2.sb.app;
 
 import com.rad2.akka.common.SystemProperties;
 import com.rad2.apps.adm.ctrl.AdmAppInitializer;
-import com.rad2.ctrl.deps.JobRefFactory;
 import com.rad2.apps.bank.ctrl.BankingAppInitializer;
 import com.rad2.apps.nfv.ctrl.NFVAppInitializer;
 import com.rad2.apps.nfv.ctrl.ThirdPartyInitializer;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ctrl.BaseController;
 import com.rad2.ctrl.ControllerDependency;
+import com.rad2.ctrl.deps.JobRefFactory;
 import com.rad2.ctrl.deps.UUIDGenerator;
 import com.rad2.ctrl.deps.YetAnotherFakeControllerDependency;
 import com.rad2.ignite.common.BaseModelRegistry;
@@ -75,8 +75,8 @@ public class SBExternalComponents {
     @Bean
     SBList<BaseModelRegistry<? extends DModel>> getRegs() {
         List<BaseModelRegistry<? extends DModel>> regs =
-            new SBComponentScanner<BaseModelRegistry<? extends DModel>>(BaseModelRegistry.class, pkgPref)
-                .createInstances();
+                new SBComponentScanner<BaseModelRegistry<? extends DModel>>(BaseModelRegistry.class, pkgPref)
+                        .createInstances();
         return new SBList<>(regs);
     }
 
@@ -90,7 +90,7 @@ public class SBExternalComponents {
     SBList<BaseController> getControllers(RegistryManager rm,
                                           SBList<? extends ControllerDependency> ctrlDepsList) {
         List<BaseController> ctrlrs = new SBComponentScanner<BaseController>(BaseController.class, pkgPref)
-            .createInstances();
+                .createInstances();
         // initialize controllers with rm and dependencies
         ctrlrs.forEach(c -> c.initialize(rm, ctrlDepsList.get()));
         return new SBList<>(ctrlrs);
@@ -125,9 +125,9 @@ public class SBExternalComponents {
     @Bean
     <T extends ControllerDependency> SBList<T> getControllerDependencies(RegistryManager rm,
                                                                          List<? extends ControllerDependency>
-                                                                             controllerDepBeans) {
+                                                                                 controllerDepBeans) {
         SBList<T> ret =
-            new SBList<>(new SBComponentScanner<T>(ControllerDependency.class, pkgPref).createInstances());
+                new SBList<>(new SBComponentScanner<T>(ControllerDependency.class, pkgPref).createInstances());
         controllerDepBeans.forEach(b -> ret.add((T) b));
         return ret;
     }

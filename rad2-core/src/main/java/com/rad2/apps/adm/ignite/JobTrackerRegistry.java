@@ -3,6 +3,7 @@ package com.rad2.apps.adm.ignite;
 import com.rad2.akka.common.RegistryStateDTO;
 import com.rad2.apps.adm.akka.JobTrackerWorker;
 import com.rad2.common.utils.PrintUtils;
+import com.rad2.ctrl.deps.IJobRef;
 import com.rad2.ignite.common.BaseModelRegistry;
 import com.rad2.ignite.common.DModel;
 import org.apache.ignite.cache.query.annotations.QuerySqlField;
@@ -13,16 +14,12 @@ public class JobTrackerRegistry extends BaseModelRegistry<JobTrackerRegistry.DJo
         return DJobStateModel.class;
     }
 
-    public void failedJob(String key) {
-        this.apply(key, DJobStateModel::failedJob);
+    public DJobStateModel failedJob(String key, String result) {
+        return this.apply(key, jt -> jt.failedJob(result));
     }
 
-    public void inProgressJob(String key) {
-        this.apply(key, DJobStateModel::inProgressJob);
-    }
-
-    public void updateJob(String key, JobStatusEnum jobStatus, String result) {
-        this.apply(key, jt -> jt.updateJob(jobStatus, result));
+    public DJobStateModel updateJob(String key, JobStatusEnum jobStatus, String result) {
+        return this.apply(key, jt -> jt.updateJob(jobStatus, result));
     }
 
     /**
@@ -41,14 +38,7 @@ public class JobTrackerRegistry extends BaseModelRegistry<JobTrackerRegistry.DJo
         return ret;
     }
 
-    /**
-     * Removes successful, but stale Registry entries. Staleness is defined by those entries that are older than age
-     */
-    public void cleanupEntriesOlderThan(String parentKey, long age) {
-        this.removeChildrenOfParentMatching(parentKey, k -> (k.isSuccessful() && k.isStale(age)));
-    }
-
-    public static class DJobStateModel extends DModel {
+    public static class DJobStateModel extends DModel implements IJobRef {
         @QuerySqlField
         private String jobStatus;
         @QuerySqlField
@@ -75,14 +65,9 @@ public class JobTrackerRegistry extends BaseModelRegistry<JobTrackerRegistry.DJo
             return this;
         }
 
-        public DJobStateModel failedJob() {
+        public DJobStateModel failedJob(String result) {
             this.jobStatus = JobStatusEnum.JOB_STATUS_FAILED.name();
-            this.lastUpdateTimestamp = System.currentTimeMillis();
-            return this;
-        }
-
-        public DJobStateModel inProgressJob() {
-            this.jobStatus = JobStatusEnum.JOB_STATUS_IN_PROGRESS.name();
+            this.result += result;
             this.lastUpdateTimestamp = System.currentTimeMillis();
             return this;
         }
@@ -132,12 +117,12 @@ public class JobTrackerRegistry extends BaseModelRegistry<JobTrackerRegistry.DJo
             return JobStatusEnum.JOB_STATUS_SUCCESS.compareTo(getJobStatus()) == 0;
         }
 
-        public boolean isInProgress() {
-            return JobStatusEnum.JOB_STATUS_IN_PROGRESS.compareTo(getJobStatus()) == 0;
-        }
-
         public boolean isFailed() {
             return JobStatusEnum.JOB_STATUS_FAILED.compareTo(getJobStatus()) == 0;
+        }
+
+        public boolean isResultRetrievalOnly() {
+            return JobStatusEnum.JOB_STATUS_RETRIEVAL_ONLY.compareTo(getJobStatus()) == 0;
         }
 
         public String toString() {

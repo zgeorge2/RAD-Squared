@@ -1,11 +1,12 @@
 package com.rad2.apps.adm.akka;
 
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import akka.dispatch.BoundedMessageQueueSemantics;
 import akka.dispatch.RequiresMessageQueue;
 import com.rad2.akka.common.BaseActor;
-import com.rad2.akka.common.IDeferredMessage;
-import com.rad2.akka.common.IDeferredRequest;
+import com.rad2.akka.common.BasicDeferredMessage;
+import com.rad2.akka.common.IDeferred;
 import com.rad2.akka.common.RegistryStateDTO;
 import com.rad2.akka.router.WorkerActor;
 import com.rad2.akka.router.WorkerClassArgs;
@@ -15,6 +16,8 @@ import com.rad2.ctrl.deps.IJobRef;
 import com.rad2.ctrl.deps.JobRef;
 import com.rad2.ignite.common.DModel;
 import com.rad2.ignite.common.RegistryManager;
+
+import java.util.function.Consumer;
 
 /**
  * JobTrackerWorker Actors work with JobTrackerRouters to provide JobTracking service per node in the cluster
@@ -32,6 +35,14 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
         this.banner = banner;
     }
 
+    private JobConsumers getJCons() {
+        return JobConsumers.getInstance();
+    }
+
+    private JobTrackerRegistry getJTReg() {
+        return reg(JobTrackerRegistry.class);
+    }
+
     static public Props props(WorkerClassArgs args) {
         return Props.create(JobTrackerWorker.class, args.getRM(), args.getId(),
                 args.getArg(BANNER_KEY));
@@ -42,56 +53,127 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
         return super.createReceive()
                 .orElse(receiveBuilder()
                         .match(InitJob.class, this::initJob)
-                        .match(InProgressJob.class, this::inProgressJob)
-                        .match(FailedJob.class, this::failedJob)
+                        .match(InitJobRetrieval.class, this::initJobRetrieval)
+                        .match(FailedGetResult.class, this::failedGetResult) // FailedGetResult first
+                        .match(FailedJob.class, this::failedJob) // FailedJob after FailedGetResult - inheritance
                         .match(UpdateJob.class, this::updateJob)
-                        .match(RemoveJob.class, this::removeJob)
                         .match(CleanUp.class, this::cleanUp)
-                        .match(GetJobResult.class, this::getJobResult)
+                        .match(GetResult.class, this::getResult)
+                        .match(NotifyConsumers.class, this::notifyConsumers)
+                        .match(RemoveConsumers.class, this::removeConsumers)
                         .build());
     }
 
     private void initJob(InitJob arg) {
-        RegistryStateDTO dto = new JobTrackerRegStateDTO(arg.getParentKey(), arg.getName(),
-                JobStatusEnum.JOB_STATUS_NOT_STARTED);
-        reg(dto).add(dto);
+        // store the job persistently if it doesn't already have an entry, else only add the consumer
+        initJobWithStatus(arg, JobStatusEnum.JOB_STATUS_NOT_STARTED);
+    }
+
+    private void initJobRetrieval(InitJobRetrieval arg) {
+        // if the job is already there, then ignore and add consumer.
+        // If it isn't there - then this is an attempt to get a result for a non-existent job.
+        // Add the consumer only
+        initJobWithStatus(arg, JobStatusEnum.JOB_STATUS_RETRIEVAL_ONLY);
+    }
+
+    private void initJobWithStatus(JobReqWithConsumer arg, JobStatusEnum status) {
+        // add the consumer
+        getJCons().addConsumer(new AddConsumer(arg.jobRef(), arg.cons));
+        // persist the job
+        JobTrackerRegistry.DJobStateModel model = getJTReg().get(arg.jobRegId());
+        if (model == null) {
+            // initialize the job in the registry
+            String jobResultIntro = String.format(JobStatusEnum.JOB_RESULT_INTRO_FORMAT, arg.jobRegId(), arg.jobRegId());
+            RegistryStateDTO dto = new JobTrackerRegStateDTO(arg.jobRef().getParentKey(), arg.jobRef().getName(),
+                    status, jobResultIntro);
+            reg(dto).add(dto);
+        }
+        // AFTER the consumer has been added and the registry updated. Then perform the nextStep
+        arg.nextStep.accept(arg);
+    }
+
+    /**
+     * This method can be called incrementally to update the result in the Registry.
+     * Each time it is called - it also notifies the consumers registered against this IJobRef.
+     */
+    private void updateJob(UpdateJob arg) {
+        // store the result persistently
+        JobTrackerRegistry.DJobStateModel model = getJTReg().updateJob(arg.regId(), arg.jobStatus, arg.result);
+        // allow consumers of the jobref to get the updated result
+        sendNotifyConsumers(arg, model.getResult(), false);
+    }
+
+    /**
+     * This method prepares a final result based on whatever is currently available
+     * for the result in the registry and  notifies the consumers registered against this IJobRef.
+     */
+    private void getResult(GetResult arg) {
+        // Get the IJobRef regid and prepare the result
+        String origJobRegId = arg.jobRegId();
+        JobTrackerRegistry.DJobStateModel model = getJTReg().get(origJobRegId);
+        if (model != null) {
+            String ret = "";
+            if (model.isSuccessful() || model.isFailed()) {
+                ret = model.getResult();
+                sendNotifyConsumers(arg.jobRef(), ret, true);
+            } else if (model.isResultRetrievalOnly()) {
+                // this job was created for result retrieval and has no result. return a failure
+                self().tell(new FailedGetResult(arg.jobRef()), self()); // failed job will send the notify
+            } else {
+                ret = model.getJobStatus().toString();
+                sendNotifyConsumers(arg.jobRef(), ret, true);
+            }
+        }
     }
 
     private void failedJob(FailedJob arg) {
-        this.getJTReg().failedJob(arg.regId());
+        JobTrackerRegistry.DJobStateModel model = getJTReg().failedJob(arg.regId(), arg.result);
+        // allow consumers of the jobref to get the updated result
+        sendNotifyConsumers(arg, model.getResult(), false);
     }
 
-    private void inProgressJob(InProgressJob arg) {
-        this.getJTReg().inProgressJob(arg.regId());
+    private void failedGetResult(FailedGetResult arg) {
+        JobTrackerRegistry.DJobStateModel model = getJTReg().failedJob(arg.regId(), arg.result);
+        // allow consumers of the jobref to get the updated result
+        sendNotifyConsumers(arg, model.getResult(), true);
     }
 
-    private void updateJob(UpdateJob arg) {
-        this.getJTReg().updateJob(arg.regId(), arg.jobStatus, arg.result);
+    // send the result to the node that has the consumers
+    // for this jobref. If local is set to true - then use the local JR only.
+    private void sendNotifyConsumers(IJobRef ijr, String result, boolean local) {
+        ActorSelection jr = local ? getJR() : getJR(ijr);
+        jr.tell(new NotifyConsumers(ijr, result), self());
     }
 
-    private void getJobResult(GetJobResult arg) {
-        String ret = "Failed to get JobResult. May have expired or is invalid!";
-        JobTrackerRegistry.DJobStateModel model = this.getJTReg().get(arg.getJobRefRegId());
-        if (model != null) {
-            if (model.isSuccessful()) {
-                ret = model.getResult();
-            } else {
-                ret = model.getJobStatus().toString();
-            }
-        }
-        arg.setResponse(ret);
-    }
-
-    private void removeJob(RemoveJob arg) {
-        boolean ret = this.getJTReg().removeJob(arg.regId());
+    // locally update the consumers corresponding to the job
+    private void notifyConsumers(NotifyConsumers arg) {
+        // allow consumers of the jobref to get the updated result
+        getJCons().notifyConsumers(arg);
     }
 
     private void cleanUp(CleanUp arg) {
-        this.getJTReg().cleanupEntriesOlderThan(arg.getParentKey(), arg.getAge());
+        // clean up the registry of older entries
+        getJTReg().removeChildrenOfParentMatching(arg.getParentKey(), k -> (k.isStale(arg.getAge())));
+        // also clean up the corresponding consumers
+        getJTReg().applyToChildrenOfParent(arg.getParentKey(),
+                k -> {
+                    if (k.isStale(arg.getAge())) {
+                        sendRemoveConsumers(k);
+                    }
+                    return true;
+                });
     }
 
-    private JobTrackerRegistry getJTReg() {
-        return reg(JobTrackerRegistry.class);
+    // send the removeConsumers to the node that has the consumers
+    // for this jobref.
+    private void sendRemoveConsumers(IJobRef ijr) {
+        getJR(ijr).tell(new RemoveConsumers(ijr), self());
+    }
+
+    // locally remove consumers corresponding to the job
+    private void removeConsumers(RemoveConsumers arg) {
+        // allow consumers of the jobref to get the updated result
+        getJCons().removeConsumers(arg);
     }
 
     /**
@@ -103,10 +185,10 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
         public static final String ATTR_JOB_RESULT_KEY = "JOB_RESULT_KEY";
         public static final String ATTR_JOB_LAST_UPDATE_KEY = "JOB_LAST_UPDATE_KEY";
 
-        public JobTrackerRegStateDTO(String parentKey, String name, JobStatusEnum jobStatus) {
+        public JobTrackerRegStateDTO(String parentKey, String name, JobStatusEnum jobStatus, String result) {
             super(JobTrackerRegistry.class, parentKey, name);
             this.putAttr(ATTR_JOB_STATUS_KEY, jobStatus);
-            this.putAttr(ATTR_JOB_RESULT_KEY, "");
+            this.putAttr(ATTR_JOB_RESULT_KEY, result);
             this.putAttr(ATTR_JOB_LAST_UPDATE_KEY, System.currentTimeMillis());
         }
 
@@ -135,21 +217,37 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
         }
     }
 
-    public static class InitJob extends JobRef {
-        public InitJob(IJobRef ijr) {
-            super(ijr);
+    /**
+     * Messages for this Actor
+     */
+    public static class JobReqWithConsumer extends BasicDeferredMessage<String> {
+        Consumer<String> cons; // the consumer of the result
+        Consumer<IDeferred<String>> nextStep; // the next step to perform with this request
+
+        public JobReqWithConsumer(IDeferred<String> req,
+                                  Consumer<String> cons, Consumer<IDeferred<String>> nextStep) {
+            super(req);
+            this.cons = cons;
+            this.nextStep = r -> {
+                // note that r itself is ignored. Its the original req that needs to be used in the nextStep
+                nextStep.accept(req); // chain the local nextStep to the argument nextStep in order to capture req
+            };
         }
     }
 
-    public static class FailedJob extends JobRef {
-        public FailedJob(IJobRef ijr) {
-            super(ijr);
+    public static class InitJob extends JobReqWithConsumer {
+
+        public InitJob(IDeferred<String> req,
+                       Consumer<String> cons, Consumer<IDeferred<String>> nextStep) {
+            super(req, cons, nextStep);
         }
     }
 
-    public static class InProgressJob extends JobRef {
-        public InProgressJob(IJobRef ijr) {
-            super(ijr);
+    public static class InitJobRetrieval extends JobReqWithConsumer {
+
+        public InitJobRetrieval(IDeferred<String> req,
+                                Consumer<String> cons, Consumer<IDeferred<String>> nextStep) {
+            super(req, cons, nextStep);
         }
     }
 
@@ -162,28 +260,26 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
             this.jobStatus = jobStatus;
             this.result = result;
         }
-
-        public UpdateJob(IJobRef ijr, JobStatusEnum jobStatus) {
-            this(ijr, jobStatus, "");
-        }
     }
 
-    static public class GetJobResult implements IDeferredMessage<String> {
-        IDeferredRequest<String> req;
+    public static class FailedJob extends JobRef {
+        public String result;
 
-        public GetJobResult(IDeferredRequest<String> req) {
-            this.req = req;
-        }
-
-        @Override
-        public IDeferredRequest<String> getEmbeddedRequest() {
-            return req;
-        }
-    }
-
-    public static class RemoveJob extends JobRef {
-        public RemoveJob(IJobRef ijr) {
+        public FailedJob(IJobRef ijr) {
             super(ijr);
+            this.result = JobStatusEnum.JOB_FAILED_FORMAT;
+        }
+    }
+
+    public static class FailedGetResult extends FailedJob {
+        public FailedGetResult(IJobRef ijr) {
+            super(ijr);
+        }
+    }
+
+    public static class GetResult extends BasicDeferredMessage<String> {
+        public GetResult(IDeferred<String> req) {
+            super(req);
         }
     }
 
@@ -202,6 +298,36 @@ public class JobTrackerWorker extends BaseActor implements WorkerActor,
 
         public long getAge() {
             return age;
+        }
+    }
+
+
+    public static class AddConsumer extends JobRef {
+        Consumer<String> cons;
+
+        public AddConsumer(IJobRef ijr, Consumer<String> cons) {
+            super(ijr);
+            this.cons = cons;
+        }
+    }
+
+    public static class NotifyConsumers extends JobRef {
+        String result;
+
+        public NotifyConsumers(IJobRef ijr, String result) {
+            super(ijr);
+            this.result = result;
+        }
+
+        public NotifyConsumers() {
+            super();
+            this.result = null;
+        }
+    }
+
+    public static class RemoveConsumers extends JobRef {
+        public RemoveConsumers(IJobRef ijr) {
+            super(ijr);
         }
     }
 }
