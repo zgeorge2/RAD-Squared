@@ -1,0 +1,62 @@
+const databaseProvider = require('../db/providers/mongodb')();
+const helper = require('../helpers/graphhelper')();
+
+function GraphService() {
+	if(!GraphService.prototype._instance) {
+		console.log("Creating a new instance of GraphService")
+		GraphService.prototype._instance = this;
+	} else {
+		console.log("Using an existing instance for GraphService");
+	}
+
+	return GraphService.prototype._instance;
+};
+
+GraphService.prototype.getNodesAndFixedLinks = function(interval) {
+	return new Promise((resolve, reject) => {
+		var dbTransactionPromiseArray = []
+		var getNodesPromise = databaseProvider.getAllNodeWithTime(interval);
+		var getFixedLinksPromise = databaseProvider.getAllFixedLinkWithTime(interval);
+		dbTransactionPromiseArray.push(getNodesPromise);
+		dbTransactionPromiseArray.push(getFixedLinksPromise);
+
+		Promise.all(dbTransactionPromiseArray)
+			.then((dbTransactionResult) => {
+				var nodes = dbTransactionResult[0];
+				var links = dbTransactionResult[1];
+				resolve(helper.modelGraph(nodes, links));
+				// var links = dbTransactionResult[1];
+
+			})
+			.catch(reject);
+	});
+};
+
+GraphService.prototype.getDynamicLinks = function(interval, type, widthThreshold) {
+	return new Promise((resolve, reject) => {
+		var getDynamicLinkPromise = databaseProvider.getAllDynamicLinkWithTimeAndGroupByFromAndTo(interval, type);
+
+		getDynamicLinkPromise
+			.then(result => {
+				resolve(helper.modelDynamicLink(result, widthThreshold));
+			})
+			.catch(reject);
+		});
+	
+}
+
+GraphService.prototype.getDynamicLinksWithMessage = function(interval, nodeId) {
+	return new Promise((resolve, reject) => {
+		var getDynamicLinkPromise = databaseProvider.getAllDynamicLinkWithTimeAndGroupByFromAndToAndMessage(nodeId, interval);
+
+		getDynamicLinkPromise
+			.then(result => {
+				resolve(result)
+			})
+			.catch(reject);
+	});
+}; 
+
+new GraphService();
+
+module.exports = GraphService;

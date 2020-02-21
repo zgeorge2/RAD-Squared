@@ -1,0 +1,26 @@
+{
+  "name": "rad2-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "cluster": "pm2 start app.js -i 0",
+    "shutdown-cluster": "pm2 delete app",
+    "cluster-logs": "pm2 logs"
+  },
+  "author": "Ishaan Kohli",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "eslint": "^5.16.0",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.19",
+    "raw-body": "^2.3.3",
+    "request": "^2.88.0",
+    "wavefrontmetrics": "^1.1.2",
+    "websocket": "^1.0.28"
+  }
+}

@@ -1,0 +1,83 @@
+<html>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style type="text/css">
+        #mynetwork {
+            width: 100%;
+            height: 60%;
+            border: 4px solid black;
+        },
+
+        h1 {
+            height: 20%;
+        },
+
+        h4 {
+            margin-block-start: 0;
+            margin-block-end: 0;
+        }
+
+        .hide {
+            display : none;
+        }
+
+        .message-list {
+            font-size: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAD-2 Actor Monitor</h1>
+        <div class"timer-button-list btn-group-togglespan">
+            <span class="btn btn-outline-secondary timer-button" value="1">1m</span>
+            <span class="btn btn-outline-primary timer-button" value="5">5m</span>
+            <span class="btn btn-outline-secondary timer-button" value="30">30m</span>
+            <span class="btn btn-outline-secondary timer-button" value="120">2h</span>
+            <span class="btn btn-outline-secondary timer-button" value="480">8h</span>
+            <span class="btn btn-outline-secondary timer-button" value="1440">1d</span>
+        </div>
+
+        <div class="edge-toggle-button-list">
+            <span type="button" class="btn btn-outline-success edge-toggle-button" value="local">Local</span>
+            <span type="button" class="btn btn-outline-success edge-toggle-button" value="remote">Remote</span>
+            <span type="button" class="btn btn-outline-success edge-toggle-button" value="dead-letter">Dead Letter</span>
+        </div>
+
+        <input type="range" class="custom-range" min="0" max="1" step="0.05" id="traffic-width">
+
+        <div class="row">
+            <div id="mynetwork"  class="col-12"></div>
+            <!-- <div class="col-4" id="info">
+                <h3>Lost Messages</h3>
+                <ul>
+                    <li><span id='from'>this/user/actor</span> to <span id="to">that/user/actor</span> - <span id='message'>ThisThatMessage</span> (<span id="type">Local</span>)</li>
+                </ul>
+            </div> -->
+            
+        </div>
+        <div class = "actor-info hide">
+                <h3>Actor Information</h3>
+                Actor name - <strong><span id="actor-name">user/ping</span></strong>
+                <br>
+                <span id="actor-system"></span>
+                <div class="message-list-heading inbound-message row">
+                        <div class="col-5">Target Actor</div><div class="col-3">Mesage</div><div class="col-1">Direction</div><div class="col-1">Count</div><div class='col-2'>type</div>
+                </div>
+                <div class="actor-message-list">
+
+                </div> 
+            </div>
+    </div>
+    
+	<script type="text/javascript" src="./js/app.js"></script>
+    <script type="text/javascript" src="./js/socket.js"></script>
+    <script type="text/javascript" src="./js/generallisteners.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o" crossorigin="anonymous"></script>
+</body>
+</html>

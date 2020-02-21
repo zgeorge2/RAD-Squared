@@ -1,0 +1,7 @@
+<% if(messages != undefined) { %>
+	<div class="message-list inbound-message row">
+		<%for(var i = 0 ; i < messages.length; i++) {%>
+			<div class="col-3"><%=messages[i].from%></div><div class="col-3"><%=messages[i].message%></div><div class="col-3"><%=messages[i].to%></div><div class="col-1"><%=messages[i].count%></div><div class='col-2'><%=messages[i].type%></div>
+		<%}%>
+	</div>
+<% } %>
