@@ -24,8 +24,8 @@ module.exports = {
 			port : 2878
 		},
 		noderef : "path",
-		clusterName : "https://elgon.wavefront.com/",
-		apiKey : "4f993fd6-df12-4969-a17c-0ade2e50e3a"
+		clusterName : "",
+		apiKey : ""
 	},
 	mongo : {
 		url : 'mongodb://localhost:27017/rad_obs_test',
