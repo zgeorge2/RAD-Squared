@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 package com.rad2.sb.app;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;

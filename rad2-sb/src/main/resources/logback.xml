@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019-2020 VMware, Inc.
+  ~ SPDX-License-Identifier: BSD-2-Clause
+  -->
+
 <configuration>
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">
