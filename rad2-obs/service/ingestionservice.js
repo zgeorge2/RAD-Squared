@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const databaseProvider = require('../db/providers/mongodb')();
 const config = require('../config/masterconfig');
 const metricParser = require('../metric-parser/' + config.parsers.metric)();

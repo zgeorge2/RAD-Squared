@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const asyncArrayParse = require('../../common/asyncarrayparse');
 const chunkSize = 10000000;
 module.exports = {

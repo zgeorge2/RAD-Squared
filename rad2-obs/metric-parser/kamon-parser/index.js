@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const BaseMetricParser = require('../basemetricparser');
 const config = require('../../config/masterconfig')["kamon-parser"];
 const metricsToParse = config.metricsToParse;

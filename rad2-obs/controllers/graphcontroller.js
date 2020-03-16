@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const graphService = require('../service/graphservice')();
 
 function GraphController() {

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const request = require('request'); 
 var body = '{"name": "Bank1","accountHolders": ["Charlie", "Chester"]}'
 
