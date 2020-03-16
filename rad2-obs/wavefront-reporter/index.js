@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 const formatter = require('./formatter');
 const WavefrontProxyClient = require('./wavefrontproxyclient');
 const WavefrontAlertManger = require('../wavefront-alert-manager');

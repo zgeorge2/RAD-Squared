@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 function AlertHelper() {
 	if(!AlertHelper.prototype._instance) {
 		console.log("Creating new instance for AlertHelper");

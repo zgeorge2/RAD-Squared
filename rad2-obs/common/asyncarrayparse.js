@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 module.exports = function (array, fn, callback, chunk) {
     var index = 0;
     // If chunk size is not given, then run the function synchrnously

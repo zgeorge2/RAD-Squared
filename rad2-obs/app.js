@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2019-2020 VMware, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 console.log('INSTANCE : ' + process.env.NODE_APP_INSTANCE + " Starting up!!");
 const startTime = Date.now();
 const expressServer = require('./server/express');

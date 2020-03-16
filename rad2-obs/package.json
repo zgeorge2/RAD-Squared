@@ -11,7 +11,7 @@
     "cluster-logs": "pm2 logs"
   },
   "author": "Ishaan Kohli",
-  "license": "ISC",
+  "license": "BSD-2",
   "dependencies": {
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
