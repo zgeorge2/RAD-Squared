@@ -15,7 +15,8 @@ Download and install
 ### Starting the RAD^2 Cluster
 
  - To run a node (say, LAX)(For NYC or SEA, change the --akka.conf & --server.port accordingly). 
- - Select profile as basic or dev. 
+ - Select profile as basic or dev.
+ 
 `$ cd <RAD^2 repo root dir>`
 
 `$ java -jar ./rad2-sb/target/rad2-sb-1.0-SNAPSHOT.jar 
