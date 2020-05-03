@@ -15,7 +15,7 @@ const wavefrontReporter = require('./wavefront-reporter')();
 
 function initializeApp() {
 	// Initlizing the Application
-	mongoProvider.connectToInstance()
+	mongoProvider.connect()
 		.then(() => {
 			return wavefrontReporter.start(Number(process.env.NODE_APP_INSTANCE));
 		})

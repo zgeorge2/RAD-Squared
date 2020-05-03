@@ -9,7 +9,7 @@ function BaseProvider() {
 
 }
 
-BaseProvider.prototype.connectToInstance = function() {
+BaseProvider.prototype.connect = function() {
 	throw new MethodNotOveriddenException();
 }
 
