@@ -33,12 +33,8 @@ module.exports = {
 		apiKey : ""
 	},
 	mongo : {
-		url : 'mongodb://localhost:27017/rad_obs_test',
-		host : 'localhost',
-		port : 27017,
-		dbName : 'rad_obs_test',
-		username : "",
-		password : ""
+		// Only URL is supported in newer version's of mongoose
+		url : 'mongodb://localhost:27017/rad_obs_test'
 	},
 	dbProviders : "mongo",
 	parsers : {

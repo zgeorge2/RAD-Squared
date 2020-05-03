@@ -15,10 +15,15 @@ const alertEventSchema = require('./models/alertevent');
 
 const config = require('../../../config/masterconfig').mongo;
 
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-// mongoose.set('debug', true);
+// Private Function
+function setUpBasicConfigs() {
+	mongoose.set('useNewUrlParser', true);
+	mongoose.set('useFindAndModify', false);
+	mongoose.set('useCreateIndex', true);
+	mongoose.set('useUnifiedTopology', true);
+	// mongoose.set('debug', true);
+}
+
 
 function MongoProvider() {
 	if(!MongoProvider.prototype._instance) {
@@ -34,8 +39,9 @@ function MongoProvider() {
 MongoProvider.prototype = Object.create(BaseProvider.prototype);
 
 // Connect to Mongo Instance
-MongoProvider.prototype.connectToInstance = function() {
+MongoProvider.prototype.connect = function() {
 	return new Promise((resolve, reject) => {
+		setUpBasicConfigs();
 		mongoose.connect(config.url, (err) => {
 			if(err) {
 				reject(err);
