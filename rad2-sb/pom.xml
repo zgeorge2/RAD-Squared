@@ -24,7 +24,7 @@
         <start-class>com.rad2.sb.app.SBApplication</start-class>
         <aspectjweaver.version>1.9.2</aspectjweaver.version>
         <springboot.version>2.2.1.RELEASE</springboot.version>
-        <springframework.version>5.2.1.RELEASE</springframework.version>
+        <springframework.version>5.2.5.RELEASE</springframework.version>
     </properties>
 
 
