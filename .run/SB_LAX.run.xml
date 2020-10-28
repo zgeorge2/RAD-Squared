@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SB_LAX" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="rad2-sb" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.rad2.sb.app.SBApplication" />
+    <option name="ENABLE_LAUNCH_OPTIMIZATION" value="false" />
+    <option name="ENABLE_JMX_AGENT" value="false" />
+    <option name="VM_PARAMETERS" value="-Xms512m -Xmx4096m -XX:+HeapDumpOnOutOfMemoryError -Dspring.profiles.active=basic -javaagent:$USER_HOME$/.rad2/lib/aspectjweaver.jar -Djava.net.preferIPv4Stack=true -Dcom.sun.management.jmxremote.port=9081 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Dspring.output.ansi.enabled=always -Dspring.liveBeansView.mbeanDomain -Dspring.application.admin.enabled=true -Dfile.encoding=UTF-8" />
+    <option name="PROGRAM_PARAMETERS" value="--server.port=9080 --akka.conf=application_akka_LAX.conf" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

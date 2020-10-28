@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SB_ALL" type="Multirun" factoryName="Multirun" singleton="false" separateTabs="true" startOneByOne="true" markFailedProcess="true" hideSuccessProcess="false" delayTime="0">
+    <runConfiguration name="SB_LAX" type="Spring Boot" />
+    <runConfiguration name="SB_NYC" type="Spring Boot" />
+    <runConfiguration name="SB_SEA" type="Spring Boot" />
+    <method v="2" />
+  </configuration>
+</component>
