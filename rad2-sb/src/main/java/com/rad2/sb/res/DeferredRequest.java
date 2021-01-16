@@ -19,10 +19,10 @@ import java.util.Map;
  * String for this implementation. Only String results are supported at this time. TODO: extend for non-Strings
  */
 public class DeferredRequest implements IDeferredRequest<String> {
-    private static long DEFAULT_TIMEOUT = 2000L;
-    private Map<String, Object> argsMap;
-    private DeferredResult<ResponseEntity<String>> result;
-    private IJobRef ijr; // set up a job ref in case the request times out.
+    private final static long DEFAULT_TIMEOUT = 2000L;
+    private final Map<String, Object> argsMap;
+    private final DeferredResult<ResponseEntity<String>> result;
+    private final IJobRef ijr; // set up a job ref in case of request timeout.
 
     public DeferredRequest(IJobRef ijr) {
         this(DEFAULT_TIMEOUT, ijr);

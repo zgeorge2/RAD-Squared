@@ -34,7 +34,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
     private ActorSystem system;
 
     public AkkaActorSystemUtility(SystemProperties sysProps, RegistryManager rm) {
-        PrintUtils.printToActor("*** Creating AkkaActorSystemUtility ***");
+        PrintUtils.print("*** Creating AkkaActorSystemUtility ***");
         this.rm = rm;
 
         // store these details in the SCReg. This will allow other nodes in the cluster to reach this systems
@@ -53,7 +53,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
      * caller must NOT block on this method
      */
     public void terminate() {
-        PrintUtils.printToActor("Start terminating the Actor System by calling System.exit ...");
+        PrintUtils.print("Start terminating the Actor System by calling System.exit ...");
         ActorSystem sys = this.getActorSystem();
         // schedule (with zero delay) the system exit. Cannot be done on the calling thread.
         sys.scheduler().scheduleOnce(Duration.Zero(), () -> System.exit(1), sys.dispatcher());
@@ -63,16 +63,16 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
      * setup a shutdown hook for the actor system to shutdown gracefully
      */
     public void setupActorSystemShutdown() {
-        PrintUtils.printToActor("Setting up Actor System shutdown hook ...");
+        PrintUtils.print("Setting up Actor System shutdown hook ...");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 Await.result(getActorSystem().terminate(), Duration.create(15, TimeUnit.SECONDS));
             } catch (Exception e) {
-                PrintUtils.printToActor("Failed to Shut down Actor System");
+                PrintUtils.print("Failed to Shut down Actor System");
                 e.printStackTrace();
             }
         }));
-        this.getActorSystem().registerOnTermination(() -> PrintUtils.printToActor("ActorSystem terminated!"));
+        this.getActorSystem().registerOnTermination(() -> PrintUtils.print("ActorSystem terminated!"));
     }
 
     /**
@@ -90,7 +90,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
         String actorName = this.getActorName(actorPath);
         ActorSelection actorParent = this.getActorParent(actorPath);
         if (actorParent == null) {
-            PrintUtils.printToActor("Failed to create actor:[%s]. Missing parent actor!", actorPath);
+            PrintUtils.print("Failed to create actor:[%s]. Missing parent actor!", actorPath);
             return ret;
         }
         if (this.pathParentEqualsUser(actorPath)) {
@@ -116,7 +116,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
         try {
             ActorSelection aSel = this.getActor(this.getLocalSystemName(), name);
             ret = Await.result(aSel.resolveOne(TIMEOUT), TIMEOUT.duration());
-            PrintUtils.printToActor("Failed to create Actor. [%s] already EXISTS!!", ret.path());
+            PrintUtils.print("Failed to create Actor. [%s] already EXISTS!!", ret.path());
         } catch (Exception e) {
             // Actor doesn't exist
             // TODO: There is no guarantee that the actor would have been found in TIMEOUT on a loaded system
@@ -138,7 +138,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
             ret = context.actorOf(propsSupplier.get(), name);
         } else {
             ret = existingChild.get();
-            PrintUtils.printToActor("Failed to create Actor. [%s] already EXISTS!!", ret.path());
+            PrintUtils.print("Failed to create Actor. [%s] already EXISTS!!", ret.path());
         }
         return ret;
     }

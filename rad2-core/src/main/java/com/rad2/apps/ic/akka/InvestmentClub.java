@@ -59,7 +59,7 @@ public class InvestmentClub extends BaseActorWithRegState {
     }
 
     private void selectAdviceForEachMember(SelectAdviceForEachMember arg) {
-        PrintUtils.printToActor("Message:SelectAdviceForEachMember from system:[%s]", arg.fromSystem);
+        PrintUtils.print("Message:SelectAdviceForEachMember from system:[%s]", arg.fromSystem);
         getAllMemberNames().forEach(mem -> {
             this.context().child(mem).get().tell(new Member.SelectFromOfferedAdvice(), self());
         });

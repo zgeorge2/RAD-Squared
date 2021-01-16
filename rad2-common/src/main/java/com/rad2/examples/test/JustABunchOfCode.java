@@ -42,13 +42,13 @@ public class JustABunchOfCode {
             String msg = m.find() ?
                 String.format("Whole:[%s]; First[%s]; Second[%s]", m.group(0), m.group(1), m.group(2)) :
                 "No Match";
-            PrintUtils.printToActor("%s -> {%s}", s, msg);
+            PrintUtils.print("%s -> {%s}", s, msg);
         }
 
         try {
             String className = j.getClass().getName();
             Class<?> clazz = Class.forName(className);
-            PrintUtils.printToActor("j's Class = %s", className);
+            PrintUtils.print("j's Class = %s", className);
             JustABunchOfCode j1 = (JustABunchOfCode) clazz.getDeclaredConstructor().newInstance();
             j1.testReflectionClassMethods();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException
@@ -63,7 +63,7 @@ public class JustABunchOfCode {
         if (Objects.isNull(path) || path.length() == 0) return;
         String parentPath = path.substring(0, path.lastIndexOf('/'));
         String lastPathPart = path.substring(path.lastIndexOf('/') + 1, path.length());
-        PrintUtils.printToActor("path=[%s]; parentPath=[%s]; lastPathPart=[%s]", path, parentPath,
+        PrintUtils.print("path=[%s]; parentPath=[%s]; lastPathPart=[%s]", path, parentPath,
             lastPathPart);
     }
 
@@ -77,27 +77,27 @@ public class JustABunchOfCode {
     }
 
     private void testReflectionClassMethods() {
-        PrintUtils.printToActor("this.getClass() = %s", this.getClass());
-        PrintUtils.printToActor("this.getClass().getName() = %s", this.getClass().getName());
-        PrintUtils.printToActor("this.getClass().getCanonicalName() = %s",
+        PrintUtils.print("this.getClass() = %s", this.getClass());
+        PrintUtils.print("this.getClass().getName() = %s", this.getClass().getName());
+        PrintUtils.print("this.getClass().getCanonicalName() = %s",
             this.getClass().getCanonicalName());
-        PrintUtils.printToActor("this.getClass().getSimpleName().toUpperCase() = %s",
+        PrintUtils.print("this.getClass().getSimpleName().toUpperCase() = %s",
             this.getClass().getSimpleName().toUpperCase());
-        PrintUtils.printToActor("this.getClass().getTypeName() = %s", this.getClass().getTypeName());
+        PrintUtils.print("this.getClass().getTypeName() = %s", this.getClass().getTypeName());
     }
 
     private void testJobEnum() {
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("JOB_STATUS_NOT_STARTED"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("JOB_STATUS_NOT_STARTED"),
             JobStatusEnum.JOB_STATUS_NOT_STARTED.name());
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("JOB_STATUS_IN_PROGRESS"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("JOB_STATUS_IN_PROGRESS"),
             JobStatusEnum.JOB_STATUS_IN_PROGRESS.name());
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("JOB_STATUS_SUCCESS"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("JOB_STATUS_SUCCESS"),
             JobStatusEnum.JOB_STATUS_SUCCESS.name());
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("JOB_STATUS_FAILED"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("JOB_STATUS_FAILED"),
             JobStatusEnum.JOB_STATUS_FAILED.name());
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("JOB_STATUS_INVALID"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("JOB_STATUS_INVALID"),
             JobStatusEnum.JOB_STATUS_INVALID.name());
-        PrintUtils.printToActor("%s:%s", JobStatusEnum.get("FAKE_JOB_STATUS"),
+        PrintUtils.print("%s:%s", JobStatusEnum.get("FAKE_JOB_STATUS"),
             JobStatusEnum.JOB_STATUS_INVALID.name());
     }
 

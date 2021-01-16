@@ -71,7 +71,7 @@ public class MasterRouter extends BaseActor {
     @ActorMessageHandler
     private void passItOn(Object o) {
         if (this.router == null) {
-            PrintUtils.printToActor("PassItOn: No router configured! NOTHING TO DO!!");
+            PrintUtils.print("PassItOn: No router configured! NOTHING TO DO!!");
             return;
         }
         this.router.route(o, getSender());
@@ -84,7 +84,7 @@ public class MasterRouter extends BaseActor {
     @ActorMessageHandler
     private void terminated(Terminated t) {
         if (this.router == null) {
-            PrintUtils.printToActor("Terminated: No router configured! NOTHING TO DO!!");
+            PrintUtils.print("Terminated: No router configured! NOTHING TO DO!!");
             return;
         }
         router = router.removeRoutee(t.actor());
@@ -98,10 +98,10 @@ public class MasterRouter extends BaseActor {
     @ActorMessageHandler
     private void increaseRoutees(IncreaseRoutees arg) {
         if (this.router == null) {
-            PrintUtils.printToActor("Terminated: No router configured! NOTHING TO DO!!");
+            PrintUtils.print("Terminated: No router configured! NOTHING TO DO!!");
             return;
         }
-        PrintUtils.printToActor("Inc Routees: in [%s]", this.getAU().getLocalSystemName());
+        PrintUtils.print("Inc Routees: in [%s]", this.getAU().getLocalSystemName());
         router = router.addRoutee(this.createWorker("I"));
     }
 
@@ -111,7 +111,7 @@ public class MasterRouter extends BaseActor {
      */
     @ActorMessageHandler
     private void removeRoutees(RemoveRoutees arg) {
-        PrintUtils.printToActor("Removing a routee: in [%s]", this.getAU().getLocalSystemName());
+        PrintUtils.print("Removing a routee: in [%s]", this.getAU().getLocalSystemName());
         Routee routeeToRemove = router.routees().last();
         router = router.removeRoutee(routeeToRemove);
         routeeToRemove.send(new Terminate(), self());

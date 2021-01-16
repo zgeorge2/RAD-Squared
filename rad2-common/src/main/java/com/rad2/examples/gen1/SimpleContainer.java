@@ -12,7 +12,7 @@ public class SimpleContainer extends BaseContainer<SimpleObject> {
     }
 
     public void doSomethingSimple(String message) {
-        PrintUtils.printToActor("SIMPLE MESSAGE:%s", message);
+        PrintUtils.print("SIMPLE MESSAGE:%s", message);
     }
 }
 

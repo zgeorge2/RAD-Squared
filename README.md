@@ -32,5 +32,15 @@ Download and install
  - Default credentials - `basic/basic` for the `basic` profile
  - Content-Type - `application/json`
 
+##### DBeaver (Community Edition) (or other Database Viewer)
+Download & Install DBeaver from https://dbeaver.io/download/
+For connection setup, search for "Apache Ignite" in the "All" category. 
+Choose and add port 10800. You can leave the rest of the unfilled entries as-is.
+Start at least one node of the RAD^2 Cluster. 
+Now test the connection in DBeaver. 
+It may fail because the right driver version isn't present. 
+A prompt will come up to auto-download the  correct version. Click Ok 
+Now re-test the connection. 
+
  
 

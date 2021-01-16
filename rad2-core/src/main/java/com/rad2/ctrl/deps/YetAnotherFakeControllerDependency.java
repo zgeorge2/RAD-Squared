@@ -19,11 +19,11 @@ public class YetAnotherFakeControllerDependency implements IFakeControllerDepend
     }
 
     public void doSomething() {
-        PrintUtils.printToActor("*** [%s] is trying to doSomething Fakey ***", this.getType());
+        PrintUtils.print("*** [%s] is trying to doSomething Fakey ***", this.getType());
     }
 
     public void doSomethingElse() {
-        PrintUtils.printToActor("*** [%s] is trying to doSomethingElse Fakey ***", this.getType());
+        PrintUtils.print("*** [%s] is trying to doSomethingElse Fakey ***", this.getType());
     }
 }
 

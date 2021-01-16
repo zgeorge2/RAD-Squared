@@ -21,7 +21,7 @@ public abstract class BaseModelRegistry<K extends DModel>
     private BaseModelQueries<K> queryMap;
 
     protected BaseModelRegistry() {
-        PrintUtils.printToActor("*** Creating  instance of %s ***", this.getClass());
+        PrintUtils.print("*** Creating  instance of %s ***", this.getClass());
     }
 
     public void initialize(RegistryManager rm) {
@@ -39,22 +39,22 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Hook that can be implemented by the child class to do custom handling AFTER the state has been added to
-     * the registry
+     * Hook that can be implemented by the child class to do custom handling
+     * AFTER the state has been added to the registry
      */
     public void postAdd(RegistryStateDTO dto) {
     }
 
     /**
-     * Hook that can be implemented by the child class to do custom handling BEFORE the state has been added
-     * to the registry
+     * Hook that can be implemented by the child class to do custom handling
+     * BEFORE the state has been added to the registry
      */
     public void preAdd(RegistryStateDTO dto) {
     }
 
     /**
-     * add the Supplier provided object to the registry against the given key. If an object is already
-     * present, it is NOT replaced.
+     * add the Supplier provided object to the registry against the given key.
+     * If an object is already present, it is NOT replaced.
      *
      * @return
      */
@@ -63,7 +63,8 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * update the Supplier provided object into the registry against the given key.
+     * update the Supplier provided object into the registry against the given
+     * key.
      *
      * @return
      */
@@ -72,21 +73,28 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Actor State that needs to be added to the registry must be sent in via the DTO. The Registry adds such
-     * state and then returns the pKey for the entry
+     * Actor State that needs to be added to the registry must be sent in via
+     * the DTO. The Registry adds such state and then returns the pKey for the
+     * entry
      *
      * @return
      */
     public final String add(RegistryStateDTO dto) {
         this.preAdd(dto);
-        boolean addSuccess = this.add(dto.getKey(), () -> dto.toModel());
-        if (addSuccess) this.postAdd(dto); // if the addition was unsuccessful, then avoid the post action
+        boolean success = this.add(dto.getKey(), () -> dto.toModel());
+        if (success) {
+            this.postAdd(dto); // if the addition was unsuccessful, then avoid the post action
+        }
+        PrintUtils.print("****** Reg Entry [type: %s] [Name: " + "%s] %s ******",
+                this.getModelClass().getSimpleName(), dto.getKey(),
+                (success ? "ADDED!" : "MAY EXIST!"));
         return dto.getKey();
     }
 
     /**
-     * Actor State that needs to be updated into the registry must be sent in via the DTO. The Registry
-     * updates such state and then returns the pKey for the entry
+     * Actor State that needs to be updated into the registry must be sent in
+     * via the DTO. The Registry updates such state and then returns the pKey
+     * for the entry
      *
      * @return
      */
@@ -96,8 +104,9 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Actor State that needs to be added to the registry is created by the Function and then added to the
-     * registry. The method then returns the pKey for the entry
+     * Actor State that needs to be added to the registry is created by the
+     * Function and then added to the registry. The method then returns the pKey
+     * for the entry
      *
      * @return
      */
@@ -106,8 +115,9 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Actor State that needs to be updated to the registry is created by the Function and then added to the
-     * registry. The method then returns the pKey for the entry
+     * Actor State that needs to be updated to the registry is created by the
+     * Function and then added to the registry. The method then returns the pKey
+     * for the entry
      */
     public final <R extends RegistryStateDTO> String update(String key, Function<K, R> func) {
         return this.update(this.apply(key, func));
@@ -122,7 +132,8 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * For all registry entries whose parent is the parentKey, remove entries that pass the function matcher
+     * For all registry entries whose parent is the parentKey, remove entries
+     * that pass the function matcher
      */
     public void removeChildrenOfParentMatching(String parentKey, Function<K, Boolean> matcher) {
         this.getQueryMap().removeChildrenOfParentMatching(parentKey, matcher);
@@ -130,14 +141,14 @@ public abstract class BaseModelRegistry<K extends DModel>
 
     /**
      * For the registry object matching the key, apply the Function
-     *
      */
     public <R> R apply(String key, Function<K, R> func) {
         return this.getQueryMap().apply(key, func);
     }
 
     /**
-     * For all registry entries whose parent is the parentKey, perform the given Consumer function
+     * For all registry entries whose parent is the parentKey, perform the given
+     * Consumer function
      */
     public <R> Map<String, R> applyToChildrenOfParent(String parentKey, Function<K, R> func) {
         return this.getQueryMap().applyToChildrenOfParent(parentKey, func);
@@ -151,7 +162,8 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * For all registry entries filtered by the named query, perform the given Consumer function
+     * For all registry entries filtered by the named query, perform the given
+     * Consumer function
      */
     public <R> Map<String, R> applyToFiltered(Function<K, R> func, String queryName, Object... args) {
         return this.getQueryMap().applyToFiltered(func, queryName, args);
@@ -192,8 +204,8 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Get the registry entries whose column values match those of args (each arg is a column name to its
-     * value).
+     * Get the registry entries whose column values match those of args (each
+     * arg is a column name to its value).
      *
      * @return
      */
@@ -253,8 +265,9 @@ public abstract class BaseModelRegistry<K extends DModel>
     }
 
     /**
-     * Return the Class of the parent registry. Registries are arranged in a tree within the Registry Manager
-     * in order to facilitate Actor reincarnation from the Registries (for those Actors that need to be
+     * Return the Class of the parent registry. Registries are arranged in a
+     * tree within the Registry Manager in order to facilitate Actor
+     * reincarnation from the Registries (for those Actors that need to be
      * reincarnated)
      *
      * @return

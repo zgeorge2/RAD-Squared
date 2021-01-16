@@ -55,7 +55,7 @@ public class TermDeposit extends BaseActorWithRegState {
         // apply the query to get the selected advice for the member with the given td.
         this.getAdvReg().applyToFiltered(advSelectorFunc, "select_one_advice_for_member_with_td",
             arg.forMember, this.getName());
-        PrintUtils.printToActor(selAdv.toString());
+        PrintUtils.print(selAdv.toString());
         // finally set the selected advice into the TD
         this.getTDReg().selectAdvice(this.getRegId(), selAdv.selectedAdvice);
     }

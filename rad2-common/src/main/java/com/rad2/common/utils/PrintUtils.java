@@ -15,12 +15,12 @@ public class PrintUtils {
         return String.format(format, s).replace(' ', padChar);
     }
 
-    public static void printToActor(String format, Object... args) {
+    public static void print(String format, Object... args) {
         log.info(String.format(format, args));
         //System.out.println(composeMessage(String.format(format, args)));
     }
 
-    public static void printToActor(String message) {
+    public static void print(String message) {
         log.info(message);
         //System.out.println(composeMessage(message));
     }

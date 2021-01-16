@@ -62,7 +62,7 @@ public class ProviderResourceWorker extends BaseActor implements WorkerActor,
         RegistryStateDTO dto = new ResRegistry.ResRegDTO(arg.parentKey, arg.name, arg.numCPU,
             arg.maxMem);
         String regId = reg(dto).add(dto);
-        PrintUtils.printToActor("****** Created Host [%s]: [%s] ******", self().path().toString(), dto);
+        PrintUtils.print("****** Created Host [%s]: [%s] ******", self().path().toString(), dto);
     }
 
     @ActorMessageHandler
@@ -81,8 +81,8 @@ public class ProviderResourceWorker extends BaseActor implements WorkerActor,
             return true;
         };
         this.getDCReg().applyToAll(func);
-        PrintUtils.printToActor("Worker:[%s]", self().path().toString());
-        PrintUtils.printToActor("%s", sb.toString());
+        PrintUtils.print("Worker:[%s]", self().path().toString());
+        PrintUtils.print("%s", sb.toString());
     }
 
     @ActorMessageHandler
@@ -100,7 +100,7 @@ public class ProviderResourceWorker extends BaseActor implements WorkerActor,
         String regId = arg.getRegId();
         ResRegistry.D_NFV_ResModel model = getDCReg().reserveResource(regId, arg.cpuNeeded,
             arg.memNeeded);
-        PrintUtils.printToActor("****** Reserved CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
+        PrintUtils.print("****** Reserved CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
             self().path().toString(), model);
     }
 
@@ -109,7 +109,7 @@ public class ProviderResourceWorker extends BaseActor implements WorkerActor,
         String regId = arg.getRegId();
         ResRegistry.D_NFV_ResModel model = getDCReg().returnResource(regId, arg.cpuReturned,
             arg.memReturned);
-        PrintUtils.printToActor("****** Returned CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
+        PrintUtils.print("****** Returned CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
             self().path().toString(), model);
     }
 
@@ -117,7 +117,7 @@ public class ProviderResourceWorker extends BaseActor implements WorkerActor,
     private void returnCPUById(ReturnResourceById arg) {
         ResRegistry.D_NFV_ResModel model = getDCReg().returnResource(arg.resKey, arg.cpuReturned,
             arg.memReturned);
-        PrintUtils.printToActor("****** Returned CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
+        PrintUtils.print("****** Returned CPU/Mem using Worker [%s] for Datacenter: [%s] ******",
             self().path().toString(), model);
     }
 

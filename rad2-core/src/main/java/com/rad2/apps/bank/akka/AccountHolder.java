@@ -100,9 +100,9 @@ public class AccountHolder extends BaseActorWithRegState {
         try {
             Thread.sleep(arg.getSleepInMillis());
         } catch (Exception e) {
-            PrintUtils.printToActor(e.toString());
+            PrintUtils.print(e.toString());
         }
-        PrintUtils.printToActor("****** [%s]: [%d] + [%d] = [%d]******", self().path().toString(), arg.getA(), arg.getB(), arg.getB() + arg.getA());
+        PrintUtils.print("****** [%s]: [%d] + [%d] = [%d]******", self().path().toString(), arg.getA(), arg.getB(), arg.getB() + arg.getA());
     }
 
     private List<ActorRef> getAllAccountsList() {

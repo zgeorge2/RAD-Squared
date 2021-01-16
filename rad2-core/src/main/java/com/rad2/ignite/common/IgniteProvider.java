@@ -44,7 +44,7 @@ public class IgniteProvider {
     private Map<String, IAtomicLong> idGenMap;
 
     public IgniteProvider(SystemProperties sysProps) {
-        PrintUtils.printToActor("*** Creating the IgniteProvider!!! ***");
+        PrintUtils.print("*** Creating the IgniteProvider!!! ***");
         this.sysProps = sysProps;
         this.ignite = start(getIgniteConfiguration());
         // create the transaction holder
@@ -55,7 +55,7 @@ public class IgniteProvider {
 
     public boolean shutdown() {
         Ignition.stop(true);
-        PrintUtils.printToActor("Shutting down Ignite nodes");
+        PrintUtils.print("Shutting down Ignite nodes");
         return true;
     }
 
@@ -138,10 +138,10 @@ public class IgniteProvider {
         // Set initial IP multicast addresses.
 
         if(this.sysProps.getDiscoveryMode().equals("local")) {
-            PrintUtils.printToActor("*************** Ignite Cluster running on localhost");
+            PrintUtils.print("*************** Ignite Cluster running on localhost");
             ipFinder.setAddresses(Collections.singletonList("localhost"));
         } else if(this.sysProps.getDiscoveryMode().equals("remote")){
-            PrintUtils.printToActor("*************** Ignite Cluster running on different machines");
+            PrintUtils.print("*************** Ignite Cluster running on different machines");
             ipFinder.setAddresses(this.sysProps.getIgniteMachines());
         }
         //ipFinder.setMulticastGroup("224.0.0.1");
@@ -188,13 +188,13 @@ public class IgniteProvider {
         @Override
         public void onLifecycleEvent(LifecycleEventType evt) {
             if (evt == LifecycleEventType.BEFORE_NODE_START) {
-                PrintUtils.printToActor("Received BEFORE_NODE_START");
+                PrintUtils.print("Received BEFORE_NODE_START");
             } else if (evt == LifecycleEventType.AFTER_NODE_START) {
-                PrintUtils.printToActor("Received AFTER_NODE_START");
+                PrintUtils.print("Received AFTER_NODE_START");
             } else if (evt == LifecycleEventType.BEFORE_NODE_STOP) {
-                PrintUtils.printToActor("Received BEFORE_NODE_STOP");
+                PrintUtils.print("Received BEFORE_NODE_STOP");
             } else if (evt == LifecycleEventType.AFTER_NODE_STOP) {
-                PrintUtils.printToActor("Received AFTER_NODE_STOP");
+                PrintUtils.print("Received AFTER_NODE_STOP");
             }
         }
     }

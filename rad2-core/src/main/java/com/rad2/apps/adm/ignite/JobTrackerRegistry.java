@@ -38,7 +38,7 @@ public class JobTrackerRegistry extends BaseModelRegistry<JobTrackerRegistry.DJo
             this.remove(jobState);
             ret = true;
         } else {
-            PrintUtils.printToActor("REMOVE JOB: Failed to find Model for key[%s]", key);
+            PrintUtils.print("REMOVE JOB: Failed to find Model for key[%s]", key);
         }
         return ret;
     }

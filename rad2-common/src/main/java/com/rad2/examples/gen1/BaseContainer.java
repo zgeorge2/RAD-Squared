@@ -15,7 +15,7 @@ public abstract class BaseContainer<K extends DObject> implements UsesManager {
 
     public <T extends BaseContainer<K>> void initialize(Manager<K, T> rm) {
         this.rm = rm;
-        PrintUtils.printToActor("Initializing %s", this.getClass().getSimpleName());
+        PrintUtils.print("Initializing %s", this.getClass().getSimpleName());
     }
 
     public Manager<K, ? extends BaseContainer<K>> getManager() {
@@ -28,7 +28,7 @@ public abstract class BaseContainer<K extends DObject> implements UsesManager {
      * @return
      */
     public void doSomething(String message) {
-        PrintUtils.printToActor("MESSAGE:%s", message);
+        PrintUtils.print("MESSAGE:%s", message);
     }
 }
 

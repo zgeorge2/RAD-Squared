@@ -36,7 +36,7 @@ abstract public class BaseController implements ControllerDependencyListProvider
     private static final Pattern classNamePattern = Pattern.compile("^([a-zA-Z0-9]+)(Controller)");
     private RegistryManager rm; // the Apache Ignite Registries
     private Map<String, ControllerDependency> depMap;
-    private HashSet<Class<? extends ControllerDependency>> commonDependencies;
+    private final HashSet<Class<? extends ControllerDependency>> commonDependencies;
 
     public BaseController() {
         this.commonDependencies = this.createDependencySet();
@@ -52,10 +52,8 @@ abstract public class BaseController implements ControllerDependencyListProvider
         this.depMap = deps.stream()
                 .filter(this::isADependency)
                 .collect(Collectors.toMap(d -> d.getType(), Function.identity()));
-        this.depMap.entrySet().forEach(entry -> {
-            PrintUtils.printToActor("*** Initializing Controller [%s] w/ Dep [%s] ***",
-                    this.getClass().getSimpleName(), entry.getValue());
-        });
+        this.depMap.forEach((key, value) -> PrintUtils.print("*** Initializing Controller [%s] w/ Dep [%s] ***",
+                this.getClass().getSimpleName(), value));
     }
 
     protected AkkaActorSystemUtility getAU() {
@@ -129,7 +127,7 @@ abstract public class BaseController implements ControllerDependencyListProvider
      * Verify if the instance of dependency passed as the argument is indeed a dependency of this class or sub
      * class using the Dependency HashSet
      *
-     * @return
+     * @return true if depInstance is a dependency
      */
     private <T extends ControllerDependency> boolean isADependency(T depInstance) {
         return this.commonDependencies.stream()

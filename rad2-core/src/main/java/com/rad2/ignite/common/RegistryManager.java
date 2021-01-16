@@ -38,7 +38,7 @@ public class RegistryManager<T extends BaseModelRegistry> {
     private IgniteProvider igniteProvider;
 
     public RegistryManager(SystemProperties sysProps, List<T> regList) {
-        PrintUtils.printToActor("*** Creating RegistryManager ***");
+        PrintUtils.print("*** Creating RegistryManager ***");
         this.igniteProvider = new IgniteProvider(sysProps);
         // Registry entries may need Ignite - so create that above first.
         this.regMap = new HashMap<>();
@@ -56,7 +56,7 @@ public class RegistryManager<T extends BaseModelRegistry> {
             .stream()
             .map(regEntry -> (INAryTreeNodeData) regEntry).collect(Collectors.toList()));
         this.regsForActors.traverseBreadthFirst(regN -> {
-            PrintUtils.printToActor("Adding Reg Tree Node[%s]", regN.getPath());
+            PrintUtils.print("Adding Reg Tree Node[%s]", regN.getPath());
             return true;
         });
         // create the actor utility class AFTER the reg manager is almost wholly constructed.

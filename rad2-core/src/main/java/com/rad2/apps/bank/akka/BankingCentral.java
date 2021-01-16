@@ -151,7 +151,7 @@ public class BankingCentral extends BaseActor {
 
     @ActorMessageHandler
     private void printFibonacci(PrintFibonacci arg) {
-        PrintUtils.printToActor("%s", arg);
+        PrintUtils.print("%s", arg);
     }
 
     /**
@@ -168,7 +168,7 @@ public class BankingCentral extends BaseActor {
      */
     @ActorMessageHandler
     private void receiveBroadcastMessage(ReceiveBroadcastMessage arg) {
-        PrintUtils.printToActor("Received Broadcast [%s] from [%s]", arg.message, sender());
+        PrintUtils.print("Received Broadcast [%s] from [%s]", arg.message, sender());
     }
 
     @NotNull

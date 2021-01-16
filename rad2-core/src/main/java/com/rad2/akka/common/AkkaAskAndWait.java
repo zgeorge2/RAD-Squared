@@ -49,7 +49,7 @@ public class AkkaAskAndWait<I, O> {
         try {
             ret = (O) Await.result(Patterns.ask(this.actor, input, timeout), timeout.duration());
         } catch (Exception e) {
-            PrintUtils.printToActor("FAILED ON ASK AND WAIT: [%s]", e.getMessage());
+            PrintUtils.print("FAILED ON ASK AND WAIT: [%s]", e.getMessage());
             e.printStackTrace();
         }
         return ret;

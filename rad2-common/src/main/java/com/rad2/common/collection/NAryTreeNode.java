@@ -114,10 +114,10 @@ public class NAryTreeNode<T> {
      */
     public void printTree() {
         if (this.children.isEmpty()) {
-            PrintUtils.printToActor("[%s] ", this);
+            PrintUtils.print("[%s] ", this);
             return;
         }
-        PrintUtils.printToActor("[%s] ", this);
+        PrintUtils.print("[%s] ", this);
         this.getChildren().values().forEach(node -> {
             node.printTree();
         });

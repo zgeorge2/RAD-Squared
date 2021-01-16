@@ -95,7 +95,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
             arg.name, arg.oper, arg.resRegId, arg.cpu, arg.mem,
             arg.funcReqRegId, arg.vendorRegId, arg.lics);
         String regId = reg(dto).add(dto);
-        PrintUtils.printToActor("****** Added Network Resource Slice [%s]: [%s] ******",
+        PrintUtils.print("****** Added Network Resource Slice [%s]: [%s] ******",
             self().path().toString(), dto);
     }
 
@@ -104,7 +104,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
         RegistryStateDTO dto = new NetRelSliceRegistry.NetRelSliceRegDTO(arg.id,
             arg.name, arg.oper, arg.relRegId, arg.bw);
         String regId = reg(dto).add(dto);
-        PrintUtils.printToActor("****** Added Network Relationship Slice [%s]: [%s] ******",
+        PrintUtils.print("****** Added Network Relationship Slice [%s]: [%s] ******",
             self().path().toString(), dto);
     }
 
@@ -112,7 +112,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
     private void deleteNetResSlice(DeleteNetResSlice arg) {
         NetResSliceRegistry.D_NFV_NetResSlice model = getResSlcReg().get(arg.sliceRegId);
         getResSlcReg().remove(model);
-        PrintUtils.printToActor("****** Deleted Network Resource Slice [%s]: [%s] ******",
+        PrintUtils.print("****** Deleted Network Resource Slice [%s]: [%s] ******",
             self().path().toString(), model);
     }
 
@@ -120,7 +120,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
     private void deleteNetRelSlice(DeleteNetRelSlice arg) {
         NetRelSliceRegistry.D_NFV_NetRelSlice model = getRelSlcReg().get(arg.sliceRegId);
         getRelSlcReg().remove(model);
-        PrintUtils.printToActor("****** Deleted Network Relationship Slice [%s]: [%s] ******",
+        PrintUtils.print("****** Deleted Network Relationship Slice [%s]: [%s] ******",
             self().path().toString(), model);
     }
 
@@ -160,8 +160,8 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
         this.getRelSlcReg().applyToAll(relFunc);
 
         // print out the res func reqs and rels of the slice
-        PrintUtils.printToActor("Worker:[%s]", self().path().toString());
-        PrintUtils.printToActor("%s", sb.toString());
+        PrintUtils.print("Worker:[%s]", self().path().toString());
+        PrintUtils.print("%s", sb.toString());
     }
 
     @ActorMessageHandler
@@ -182,7 +182,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
             self().tell(new SaveNetResSlice(res.id, res.name, res.oper, res.getResRegId(),
                 vm.getCpuPer(), vm.getMemPer(), res.getFRRegId(), fr.getVRegId(), res.lics), self());
         });
-        PrintUtils.printToActor("****** Buying Net Resource Func Request Slices [%s] ******",
+        PrintUtils.print("****** Buying Net Resource Func Request Slices [%s] ******",
             self().path().toString());
 
         // Reserve slices for each relationship
@@ -193,7 +193,7 @@ public class NetworkSliceWorker extends BaseActor implements WorkerActor,
             self().tell(new SaveNetRelSlice(rel.id, rel.name, rel.oper, rel.getRelRegId(), rel.getBW()),
                 self());
         });
-        PrintUtils.printToActor("****** Buying Net Resource Func Request Slices [%s] ******",
+        PrintUtils.print("****** Buying Net Resource Func Request Slices [%s] ******",
             self().path().toString());
     }
 

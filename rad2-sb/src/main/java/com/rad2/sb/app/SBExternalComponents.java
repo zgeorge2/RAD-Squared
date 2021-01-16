@@ -8,6 +8,7 @@ package com.rad2.sb.app;
 import com.rad2.akka.common.SystemProperties;
 import com.rad2.apps.adm.ctrl.AdmAppInitializer;
 import com.rad2.apps.bank.ctrl.BankingAppInitializer;
+import com.rad2.apps.finco.ctrl.FinCoInitializer;
 import com.rad2.apps.nfv.ctrl.NFVAppInitializer;
 import com.rad2.apps.nfv.ctrl.ThirdPartyInitializer;
 import com.rad2.common.utils.PrintUtils;
@@ -32,8 +33,8 @@ import org.springframework.web.context.request.RequestContextListener;
 import java.util.List;
 
 /**
- * Declare all third party objects in this Component. This includes beans that need to be created from the
- * rad2-core module.
+ * Declare all third party objects in this Component. This includes beans that
+ * need to be created from the rad2-core module.
  */
 @Component
 public class SBExternalComponents {
@@ -48,10 +49,10 @@ public class SBExternalComponents {
         // Ensure that sending metrics to Observability Platform is turned on
         boolean shouldSentMetrics = Boolean.parseBoolean(sysProps.get(OBSERVABILITY_PLATFORM_SEND_METRICS));
         if (shouldSentMetrics) {
-            PrintUtils.printToActor("*** Will send metrics to Observability Platform");
+            PrintUtils.print("*** Will send metrics to Observability Platform");
             Kamon.addReporter(new InfluxDBReporter(Kamon.config()));
         } else {
-            PrintUtils.printToActor("*** Not sending Metrics Observability Platform");
+            PrintUtils.print("*** Not sending Metrics Observability Platform");
         }
         return shouldSentMetrics;
     }
@@ -72,8 +73,9 @@ public class SBExternalComponents {
     }
 
     /**
-     * Since Registry instances  are NOT Spring boot components and are obtained from an external module, they
-     * are obtained by scanning packages as below.
+     * Since Registry instances  are NOT Spring boot components and are obtained
+     * from an external module, they are obtained by scanning packages as
+     * below.
      *
      * @return
      */
@@ -86,8 +88,8 @@ public class SBExternalComponents {
     }
 
     /**
-     * Since Controllers are NOT Spring boot components and are obtained from an external module, the are
-     * obtained by scanning packages as below.
+     * Since Controllers are NOT Spring boot components and are obtained from an
+     * external module, the are obtained by scanning packages as below.
      *
      * @return
      */
@@ -112,8 +114,8 @@ public class SBExternalComponents {
     }
 
     /**
-     * Since BaseResources subclasses are RestControllers, they are automatically wired into the List
-     * argument.
+     * Since BaseResources subclasses are RestControllers, they are
+     * automatically wired into the List argument.
      *
      * @return
      */
@@ -155,6 +157,11 @@ public class SBExternalComponents {
     @Bean
     ControllerDependency createBankingAppInitializer(RegistryManager rm) {
         return new BankingAppInitializer(rm);
+    }
+
+    @Bean
+    ControllerDependency createFinCoAppInitializer(RegistryManager rm) {
+        return new FinCoInitializer(rm); // this is the second version of the Banking App
     }
 
     @Bean

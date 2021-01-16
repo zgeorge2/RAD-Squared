@@ -60,7 +60,7 @@ public class ProviderRelationshipWorker extends BaseActor implements WorkerActor
         RegistryStateDTO dto = new RelRegistry.RelRegDTO(arg.parentKey, arg.getName(),
             arg.dcReg1, arg.dcReg2, arg.maxBW);
         reg(dto).add(dto);
-        PrintUtils.printToActor("****** Created Host [%s]: [%s] ******", self().path().toString(), dto);
+        PrintUtils.print("****** Created Host [%s]: [%s] ******", self().path().toString(), dto);
     }
 
     @ActorMessageHandler
@@ -79,15 +79,15 @@ public class ProviderRelationshipWorker extends BaseActor implements WorkerActor
             return true;
         };
         this.getRelReg().applyToAll(func);
-        PrintUtils.printToActor("Worker:[%s]", self().path().toString());
-        PrintUtils.printToActor("%s", sb.toString());
+        PrintUtils.print("Worker:[%s]", self().path().toString());
+        PrintUtils.print("%s", sb.toString());
     }
 
     @ActorMessageHandler
     private void reserveBW(ReserveBW arg) {
         String regId = arg.getRegId();
         RelRegistry.D_NFV_RelModel model = getRelReg().reserveBW(regId, arg.bw);
-        PrintUtils.printToActor("****** Reserved Bandwidth using Worker [%s] from Relationship: [%s] ******",
+        PrintUtils.print("****** Reserved Bandwidth using Worker [%s] from Relationship: [%s] ******",
             self().path().toString(), model);
     }
 
@@ -95,14 +95,14 @@ public class ProviderRelationshipWorker extends BaseActor implements WorkerActor
     private void returnBW(ReturnBW arg) {
         String regId = arg.getRegId();
         RelRegistry.D_NFV_RelModel model = getRelReg().returnBW(regId, arg.bwReturned);
-        PrintUtils.printToActor("****** Returned Bandwidth using Worker [%s] for Relationship: [%s] ******",
+        PrintUtils.print("****** Returned Bandwidth using Worker [%s] for Relationship: [%s] ******",
             self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnBWByRegId(ReturnBWByRegId arg) {
         RelRegistry.D_NFV_RelModel model = getRelReg().returnBW(arg.regId, arg.bw);
-        PrintUtils.printToActor("****** Returned Bandwidth using Worker [%s] for Relationship: [%s] ******",
+        PrintUtils.print("****** Returned Bandwidth using Worker [%s] for Relationship: [%s] ******",
             self().path().toString(), model);
     }
 

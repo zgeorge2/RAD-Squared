@@ -55,7 +55,7 @@ public class MoneyTransfer extends BaseActor {
     @ActorMessageHandler
     private void validateAndCompleteTransfer(ValidateAndCompleteTransfer arg) {
         if (getFromAcc() == null || getToAcc() == null) {
-            PrintUtils.printToActor("Cannot validate and complete transfer. Account setup is pending!");
+            PrintUtils.print("Cannot validate and complete transfer. Account setup is pending!");
             return; // the from/to accounts need to be non-null
         }
         // debit the fromAccount

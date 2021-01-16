@@ -32,7 +32,7 @@ public class IgniteRegistry<K, V> {
     }
 
     void broadcastMessage(String message) {
-        this.rm.getIgniteProvider().broadcast(() -> PrintUtils.printToActor(message));
+        this.rm.getIgniteProvider().broadcast(() -> PrintUtils.print(message));
     }
 
     V getValue(K key) {

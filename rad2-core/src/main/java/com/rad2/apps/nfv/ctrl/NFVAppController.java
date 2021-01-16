@@ -29,7 +29,7 @@ public class NFVAppController extends BaseController {
      */
     public void buySlices(BuyNetworkSlicesDTO dto) {
         ActorSelection ir = getNetSliceRouter();
-        PrintUtils.printToActor("Buying Network Slices: %s", dto);
+        PrintUtils.print("Buying Network Slices: %s", dto);
         dto.getSlices().forEach(sl -> {
             ir.tell(new NetworkSliceWorker.BuySlice(sl), ActorRef.noSender());
         });
@@ -37,7 +37,7 @@ public class NFVAppController extends BaseController {
 
     public void retSlices(ReturnNetworkSlicesDTO dto) {
         ActorSelection ir = getNetSliceRouter();
-        PrintUtils.printToActor("Returning Network Slices: %s", dto);
+        PrintUtils.print("Returning Network Slices: %s", dto);
         dto.getSlices().forEach(sl -> {
             ir.tell(new NetworkSliceWorker.ReturnSlice(sl), ActorRef.noSender());
         });
@@ -45,7 +45,7 @@ public class NFVAppController extends BaseController {
 
     public void listSlices() {
         ActorSelection ir = getNetSliceRouter();
-        PrintUtils.printToActor("Listing Network Slices ...");
+        PrintUtils.print("Listing Network Slices ...");
         ir.tell(new NetworkSliceWorker.ListSlices(), ActorRef.noSender());
     }
 
@@ -57,7 +57,7 @@ public class NFVAppController extends BaseController {
      */
     public void addResources(ResourcesDTO dto) {
         ActorSelection ir = getResRouter();
-        PrintUtils.printToActor("Adding Resources: %s", dto);
+        PrintUtils.print("Adding Resources: %s", dto);
         dto.getResources().forEach(dc -> {
             ir.tell(new ProviderResourceWorker.AddDatacenter(dc.getNamespace(), dc.getName(), dc.cpu, dc.mem),
                 ActorRef.noSender());
@@ -66,21 +66,21 @@ public class NFVAppController extends BaseController {
 
     public void listResources() {
         ActorSelection ir = getResRouter();
-        PrintUtils.printToActor("Listing Resources ...");
+        PrintUtils.print("Listing Resources ...");
         ir.tell(new ProviderResourceWorker.ListDatacenters(), ActorRef.noSender());
     }
 
     public void resetAllResources(ResetAllResourcesDTO dto) {
         ActorSelection ir = getResRouter();
         dto.getNamespaces().forEach(ns -> {
-            PrintUtils.printToActor("Reset All Resources for Namespace [%s]...", ns);
+            PrintUtils.print("Reset All Resources for Namespace [%s]...", ns);
             ir.tell(new ProviderResourceWorker.ResetDCsForNamespace(ns), ActorRef.noSender());
         });
     }
 
     public void reserveResourceSlices(ReserveResourceSlicesDTO dto) {
         ActorSelection ir = getResRouter();
-        PrintUtils.printToActor("Reserving Resource Slice: %s", dto);
+        PrintUtils.print("Reserving Resource Slice: %s", dto);
         dto.getResources().forEach(dc -> {
             ir.tell(new ProviderResourceWorker.ReserveResource(dc.getNamespace(), dc.getName(), dc.cpu,
                 dc.mem), ActorRef.noSender());
@@ -89,7 +89,7 @@ public class NFVAppController extends BaseController {
 
     public void returnResourceSlices(ReturnResourceSlicesDTO dto) {
         ActorSelection ir = getResRouter();
-        PrintUtils.printToActor("Returning Resource Slice: %s", dto);
+        PrintUtils.print("Returning Resource Slice: %s", dto);
         dto.getResources().forEach(dc -> {
             ir.tell(new ProviderResourceWorker.ReturnResource(dc.getNamespace(), dc.getName(), dc.cpu,
                 dc.mem), ActorRef.noSender());
@@ -104,7 +104,7 @@ public class NFVAppController extends BaseController {
      */
     public void addRelationships(RelsDTO dto) {
         ActorSelection ir = getRelRouter();
-        PrintUtils.printToActor("Adding Relationships: %s", dto);
+        PrintUtils.print("Adding Relationships: %s", dto);
         dto.getRels().forEach(rel -> {
             ir.tell(new ProviderRelationshipWorker.AddRelationship(rel.getNamespace(), rel.getDC1(),
                 rel.getDC2(), rel.getBandwidth()), ActorRef.noSender());
@@ -113,14 +113,14 @@ public class NFVAppController extends BaseController {
 
     public void listRelationships() {
         ActorSelection ir = getRelRouter();
-        PrintUtils.printToActor("Listing Relationships ...");
+        PrintUtils.print("Listing Relationships ...");
         ir.tell(new ProviderRelationshipWorker.ListRelationships(), ActorRef.noSender());
     }
 
     public void resetAllRelationships(ResetAllRelsDTO dto) {
         ActorSelection ir = getRelRouter();
         dto.getRels().forEach(rel -> {
-            PrintUtils.printToActor("Reset Relationship: [%s]", rel.getName());
+            PrintUtils.print("Reset Relationship: [%s]", rel.getName());
             ir.tell(new ProviderRelationshipWorker.ResetRelationship(rel.getNamespace(), rel.getDC1(),
                     rel.getDC2()),
                 ActorRef.noSender());
@@ -129,7 +129,7 @@ public class NFVAppController extends BaseController {
 
     public void reserveRelationshipSlices(ReserveRelSlicesDTO dto) {
         ActorSelection ir = getRelRouter();
-        PrintUtils.printToActor("Reserving Relationship Slice: %s", dto);
+        PrintUtils.print("Reserving Relationship Slice: %s", dto);
         dto.getRels().forEach(rel -> {
             ir.tell(new ProviderRelationshipWorker.ReserveBW(rel.getNamespace(), rel.getDC1(), rel.getDC2(),
                 rel.getBandwidth()), ActorRef.noSender());
@@ -138,7 +138,7 @@ public class NFVAppController extends BaseController {
 
     public void returnRelationshipSlices(ReturnRelSlicesDTO dto) {
         ActorSelection ir = getRelRouter();
-        PrintUtils.printToActor("Returning Relationship Slice: %s", dto);
+        PrintUtils.print("Returning Relationship Slice: %s", dto);
         dto.getRels().forEach(rel -> {
             ir.tell(new ProviderRelationshipWorker.ReturnBW(rel.getNamespace(), rel.getDC1(), rel.getDC2(),
                 rel.getBandwidth()), ActorRef.noSender());

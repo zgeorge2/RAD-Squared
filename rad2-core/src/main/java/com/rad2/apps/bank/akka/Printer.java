@@ -44,7 +44,7 @@ public class Printer extends BaseActor implements WorkerActor,
     private void print(Print p) {
         try {
             for (int ii = 0; ii < 5; ii++) {
-                PrintUtils.printToActor("[{Thread: %s}:{%s}[%s]{Wait: %d}] ",
+                PrintUtils.print("[{Thread: %s}:{%s}[%s]{Wait: %d}] ",
                         Thread.currentThread().getId(), p.getJobId(), p.getMessage(), ii);
                 Thread.sleep(10);
             }

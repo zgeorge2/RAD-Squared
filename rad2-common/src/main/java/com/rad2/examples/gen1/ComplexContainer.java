@@ -13,7 +13,7 @@ public class ComplexContainer extends BaseContainer<ComplexObject> {
     }
 
     public void doSomethingComplex(String message) {
-        PrintUtils.printToActor("COMPLEX MESSAGE:%s", message);
+        PrintUtils.print("COMPLEX MESSAGE:%s", message);
     }
 }
 

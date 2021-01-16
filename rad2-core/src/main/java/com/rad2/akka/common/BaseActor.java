@@ -17,7 +17,7 @@ public abstract class BaseActor extends AbstractActor implements IJobWorkerClien
 
     protected BaseActor(RegistryManager rm) {
         this.rm = rm;
-        PrintUtils.printToActor("CREATED Actor: [%s]@[%s]", this.getClass().getSimpleName(),
+        PrintUtils.print("CREATED Actor: [%s]@[%s]", this.getClass().getSimpleName(),
                 this.self().path());
     }
 

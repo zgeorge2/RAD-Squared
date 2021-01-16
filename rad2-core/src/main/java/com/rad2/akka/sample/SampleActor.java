@@ -37,7 +37,7 @@ public class SampleActor extends AbstractActor {
     }
 
     private void print(Print p) {
-        PrintUtils.printToActor("Received message: [%s] from [%s]", p.message, this.getSender().path());
+        PrintUtils.print("Received message: [%s] from [%s]", p.message, this.getSender().path());
     }
 
     /**

@@ -23,11 +23,11 @@ public class BaseResource<K extends BaseController> {
     private K controller;
 
     public BaseResource() {
-        PrintUtils.printToActor("*** Creating  instance of %s ***", this.getClass());
+        PrintUtils.print("*** Creating  instance of %s ***", this.getClass());
     }
 
     public void initialize(K controller) {
-        PrintUtils.printToActor("*** Initializing [%s] with controller [%s]  ***", this.getClass(),
+        PrintUtils.print("*** Initializing [%s] with controller [%s]  ***", this.getClass(),
                 controller);
         this.controller = controller;
     }

@@ -21,7 +21,7 @@ public abstract class BaseActorWithTimer extends AbstractActorWithTimers impleme
 
     protected BaseActorWithTimer(RegistryManager rm, Tick tick) {
         this.rm = rm;
-        PrintUtils.printToActor("CREATED Timer Actor: [%s]@[%s]", this.getClass().getSimpleName(),
+        PrintUtils.print("CREATED Timer Actor: [%s]@[%s]", this.getClass().getSimpleName(),
                 this.self().path());
         startTimer(tick);
     }

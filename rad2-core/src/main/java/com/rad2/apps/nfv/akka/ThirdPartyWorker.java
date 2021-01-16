@@ -70,7 +70,7 @@ public class ThirdPartyWorker extends BaseActor implements WorkerActor,
         RegistryStateDTO dto = new ThirdPartyRegistry.ThirdPartyRegDTO(arg.name, arg.function, arg.cpuPer,
             arg.memPer, arg.maxLicenses);
         String regId = reg(dto).add(dto);
-        PrintUtils.printToActor("****** Created Vendor [%s]: [%s] ******", self().path().toString(), dto);
+        PrintUtils.print("****** Created Vendor [%s]: [%s] ******", self().path().toString(), dto);
     }
 
     @ActorMessageHandler
@@ -89,28 +89,28 @@ public class ThirdPartyWorker extends BaseActor implements WorkerActor,
             return true;
         };
         this.getTPReg().applyToAll(func);
-        PrintUtils.printToActor("Worker:[%s]", self().path().toString());
-        PrintUtils.printToActor("%s", sb.toString());
+        PrintUtils.print("Worker:[%s]", self().path().toString());
+        PrintUtils.print("%s", sb.toString());
     }
 
     @ActorMessageHandler
     private void buyLicenses(BuyLicenses arg) {
         ThirdPartyRegistry.D_NFV_ThirdPartyModel model = getTPReg().buyLicenses(arg.getRegId(), arg.lics);
-        PrintUtils.printToActor("****** Buy licenses w/ Worker [%s] for Vendor/Function: [%s] ******",
+        PrintUtils.print("****** Buy licenses w/ Worker [%s] for Vendor/Function: [%s] ******",
             self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnLicenses(ReturnLicenses arg) {
         ThirdPartyRegistry.D_NFV_ThirdPartyModel model = getTPReg().returnLicenses(arg.getRegId(), arg.lics);
-        PrintUtils.printToActor("****** Returned licenses w/ Worker [%s] for Vendor/Function: [%s] ******",
+        PrintUtils.print("****** Returned licenses w/ Worker [%s] for Vendor/Function: [%s] ******",
             self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnAllLicenses(ReturnAllLicenses arg) {
         ThirdPartyRegistry.D_NFV_ThirdPartyModel model = getTPReg().returnAllLicenses(arg.getRegId());
-        PrintUtils.printToActor("****** Returned All licenses w/ Worker [%s] of Vendor/Function: [%s] " +
+        PrintUtils.print("****** Returned All licenses w/ Worker [%s] of Vendor/Function: [%s] " +
                 "******",
             self().path().toString(), model);
     }
@@ -131,8 +131,8 @@ public class ThirdPartyWorker extends BaseActor implements WorkerActor,
             return true;
         };
         this.getFRReg().applyToAll(func);
-        PrintUtils.printToActor("Worker:[%s]", self().path().toString());
-        PrintUtils.printToActor("%s", sb.toString());
+        PrintUtils.print("Worker:[%s]", self().path().toString());
+        PrintUtils.print("%s", sb.toString());
     }
 
     @ActorMessageHandler
@@ -141,7 +141,7 @@ public class ThirdPartyWorker extends BaseActor implements WorkerActor,
         RegistryStateDTO dto = new FunctionRequestRegistry.FuncReqRegDTO(arg.oper, arg.frName,
             arg.vn, arg.vf, arg.lics);
         String regId = reg(dto).add(dto);
-        PrintUtils.printToActor("****** Registered Function Request [%s]: [%s] ******",
+        PrintUtils.print("****** Registered Function Request [%s]: [%s] ******",
             self().path().toString(), dto);
         // now buy the requested licenses from the TP Vendor by sending message to self
         self().tell(new BuyLicenses(arg.vn, arg.vf, arg.lics), self());
@@ -150,28 +150,28 @@ public class ThirdPartyWorker extends BaseActor implements WorkerActor,
     @ActorMessageHandler
     private void useLicsFromFunctionRequest(UseLicsFromFunctionRequest arg) {
         FunctionRequestRegistry.D_NFV_FuncReq model = getFRReg().useLicenses(arg.getRegId(), arg.lics);
-        PrintUtils.printToActor("****** Use licenses [%d] w/ Worker [%s] from Function Request: [%s] ******",
+        PrintUtils.print("****** Use licenses [%d] w/ Worker [%s] from Function Request: [%s] ******",
             arg.lics, self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnLicsToFunctionRequest(ReturnLicsToFunctionRequest arg) {
         FunctionRequestRegistry.D_NFV_FuncReq model = getFRReg().returnLicenses(arg.getRegId(), arg.lics);
-        PrintUtils.printToActor("****** Ret licenses [%d] w/ Worker [%s] to Function Request: [%s] ******",
+        PrintUtils.print("****** Ret licenses [%d] w/ Worker [%s] to Function Request: [%s] ******",
             arg.lics, self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnLicsToFunctionRequestById(ReturnLicsToFunctionRequestById arg) {
         FunctionRequestRegistry.D_NFV_FuncReq model = getFRReg().returnLicenses(arg.key, arg.lics);
-        PrintUtils.printToActor("****** Ret licenses [%d] w/ Worker [%s] to Function Request: [%s] ******",
+        PrintUtils.print("****** Ret licenses [%d] w/ Worker [%s] to Function Request: [%s] ******",
             arg.lics, self().path().toString(), model);
     }
 
     @ActorMessageHandler
     private void returnAllLicsToFunctionRequest(ReturnAllLicsToFunctionRequest arg) {
         FunctionRequestRegistry.D_NFV_FuncReq model = getFRReg().returnAllLicenses(arg.getRegId());
-        PrintUtils.printToActor("****** Ret All licenses w/ Worker [%s] to Function Request: [%s] ******",
+        PrintUtils.print("****** Ret All licenses w/ Worker [%s] to Function Request: [%s] ******",
             self().path().toString(), model);
     }
 

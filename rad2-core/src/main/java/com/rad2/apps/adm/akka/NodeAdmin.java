@@ -36,7 +36,7 @@ public class NodeAdmin extends BaseActor {
             this.getAU().getActorInAllRemoteSystems(NODE_ADMIN_NAME)
                 .forEach(a -> a.tell(new ShutdownNode(false), self()));
         }
-        PrintUtils.printToActor("Shutting down RAD node: [%s]", this.getAU().getLocalSystemName());
+        PrintUtils.print("Shutting down RAD node: [%s]", this.getAU().getLocalSystemName());
         this.getRM().shutdownRegistry(); // shutdown ignite
         this.getAU().terminate(); // shutdown the actor system & this process
     }
