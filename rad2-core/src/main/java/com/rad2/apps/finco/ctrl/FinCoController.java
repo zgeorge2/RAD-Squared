@@ -7,8 +7,9 @@ package com.rad2.apps.finco.ctrl;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rad2.akka.common.IDeferred;
+import com.rad2.apps.finco.akka.FCAccountWorker;
+import com.rad2.apps.finco.akka.FCData;
 import com.rad2.apps.finco.akka.FinCoWorker;
 import com.rad2.ctrl.BaseController;
 
@@ -24,11 +25,9 @@ import java.util.List;
  * available to all Actors on any Node in the cluster.
  */
 public class FinCoController extends BaseController {
-    public void addFinCo(FinCoListDTO dto) {
+    public void addFinCoList(FCData.FinCoList dto) {
         ActorSelection fcr = getFinCoRouter();
-        dto.getFinCoList().forEach(fc -> {
-            fcr.tell(new FinCoWorker.AddFinCo(fc.name, fc.branch, fc.accountHolders), ActorRef.noSender());
-        });
+        fcr.tell(new FinCoWorker.AddFinCos(dto), ActorRef.noSender());
     }
 
     public void getAllBranches(IDeferred<String> req) {
@@ -36,8 +35,27 @@ public class FinCoController extends BaseController {
         fcr.tell(new FinCoWorker.GetAllBranches(req), ActorRef.noSender());
     }
 
+    public void getAllAccountHolders(IDeferred<String> req) {
+        ActorSelection fcr = getFinCoRouter();
+        fcr.tell(new FinCoWorker.GetAllAccountHolders(req), ActorRef.noSender());
+    }
+
+    public void getAllAccounts(IDeferred<String> req) {
+        ActorSelection fcr = getFinCoRouter();
+        fcr.tell(new FinCoWorker.GetAllAccounts(req), ActorRef.noSender());
+    }
+
+    public void doTransfers(IDeferred<String> req) {
+        ActorSelection fcar = getFCAccountRouter();
+        fcar.tell(new FCAccountWorker.DoTransfers(req), ActorRef.noSender());
+    }
+
     private ActorSelection getFinCoRouter() {
         return getAU().getActor(getAU().getLocalSystemName(), FinCoWorker.FINCO_MASTER_ROUTER);
+    }
+
+    private ActorSelection getFCAccountRouter() {
+        return getAU().getActor(getAU().getLocalSystemName(), FCAccountWorker.FC_ACCOUNT_MASTER_ROUTER);
     }
 
     @Override
@@ -45,65 +63,5 @@ public class FinCoController extends BaseController {
         List<Class> ret = new ArrayList<>();
         ret.add(FinCoInitializer.class);
         return ret;
-    }
-
-    /**
-     * DTO's used by FinCoResource to communicate Data to FinCoController
-     */
-    public static class FinCoListDTO {
-        private final List<FinCoDTO> finCoList;
-
-        public FinCoListDTO() {
-            this.finCoList = new ArrayList<>();
-        }
-
-        @JsonProperty
-        public List<FinCoDTO> getFinCoList() {
-            return finCoList;
-        }
-
-        public String toString() {
-            StringBuffer sb = new StringBuffer();
-            sb.append("{[");
-            this.getFinCoList().forEach(x -> sb.append(x).append(","));
-            sb.append("]}");
-            return sb.toString();
-        }
-
-        public static class FinCoDTO {
-            private String name; // the name of the Fin Co (e.g., Citibank)
-            private String branch; // the LAX branch
-            private final List<String> accountHolders;
-
-            public FinCoDTO() {
-                this.accountHolders = new ArrayList<>();
-            }
-
-            @JsonProperty
-            public String getName() {
-                return name;
-            }
-
-            @JsonProperty
-            public String getBranch() {
-                return branch;
-            }
-
-            @JsonProperty
-            public List<String> getAccountHolders() {
-                return accountHolders;
-            }
-
-            public String toString() {
-                StringBuffer sb = new StringBuffer();
-                sb.append("{")
-                        .append("name: ").append(this.getName())
-                        .append(", branch: ").append(this.getBranch())
-                        .append(", accountHolders:[");
-                this.getAccountHolders().forEach(x -> sb.append(x).append(","));
-                sb.append("]}");
-                return sb.toString();
-            }
-        }
     }
 }

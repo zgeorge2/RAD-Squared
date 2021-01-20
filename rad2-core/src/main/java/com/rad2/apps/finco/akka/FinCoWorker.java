@@ -15,15 +15,17 @@ import com.rad2.akka.common.IDeferred;
 import com.rad2.akka.router.WorkerActor;
 import com.rad2.akka.router.WorkerClassArgs;
 import com.rad2.apps.finco.ignite.FCAccountHolderRegistry;
+import com.rad2.apps.finco.ignite.FCAccountRegistry;
 import com.rad2.apps.finco.ignite.FinCoRegistry;
+import com.rad2.common.utils.Pair;
+import com.rad2.common.utils.PrintHeader;
 import com.rad2.ignite.common.RegistryManager;
 
-import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 public class FinCoWorker extends BaseActor implements WorkerActor,
         RequiresMessageQueue<BoundedMessageQueueSemantics> {
-    private static final int ACCOUNT_STARTING_BALANCE = 100;
     public static final String FINCO_MASTER_ROUTER = "FinCoMaster";
     public static final String BANNER_KEY = "FINCO_BANNER_KEY";
     private String id; // the id of this routee.
@@ -48,61 +50,107 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
         return reg(FCAccountHolderRegistry.class);
     }
 
+    private FCAccountRegistry getACCReg() {
+        return reg(FCAccountRegistry.class);
+    }
+
     @Override
     public Receive createReceive() {
         return super.createReceive()
                 .orElse(receiveBuilder()
-                        .match(AddFinCo.class, this::addFinCo)
+                        .match(AddFinCos.class, this::addFinCoList)
                         .match(GetAllBranches.class, this::getAllBranches)
+                        .match(GetAllAccountHolders.class, this::getAllAccountHolders)
+                        .match(GetAllAccounts.class, this::getAllAccounts)
                         .build());
     }
 
     @ActorMessageHandler
-    private void addFinCo(AddFinCo arg) {
+    private void addFinCoList(AddFinCos arg) {
         // create the registry entry for each finco
-        String regId = getFCReg().add(new FinCoRegistry.FinCoRegistryStateDTO(arg.name, arg.branch));
-        // use the regId of the finco as parent key for each account holder
-        //registry entry
-        arg.accountHolders.forEach(ah -> {
-            getAHReg().add(new FCAccountHolderRegistry.FCAccountHolderRegistryStateDTO(regId, ah));
+        arg.getFinCos().forEach(fc -> {
+            String fcRegId =
+                    getFCReg().add(new FinCoRegistry.FinCoRegistryStateDTO(fc.getName(), fc.getBranch()));
+            // use the fcRegId of the finco as parent key for each account holder
+            fc.getAccountHolders().forEach(ah -> {
+                String ahRegId = getAHReg().add(new FCAccountHolderRegistry.FCAccountHolderRegistryStateDTO(fcRegId, ah.getName()));
+                // use the fcRegId of the finco as parent key for each account holder
+                ah.getAccounts().forEach(acc -> {
+                    getACCReg().createAccount(ahRegId, acc.getType(), acc.getBalance());
+                });
+            });
         });
     }
 
     @ActorMessageHandler
     private void getAllBranches(GetAllBranches arg) {
         StringBuffer sb = new StringBuffer();
-        sb.append(String.format("\n\t%30s %15s %30s\n", "Fin Corp", "Branch", "Key "));
-        sb.append(String.format("\t%30s %15s %30s\n",
-                String.join("", Collections.nCopies(30, "-")),
-                String.join("", Collections.nCopies(15, "-")),
-                String.join("", Collections.nCopies(30, "-"))));
+        PrintHeader ph = new PrintHeader(
+                new Pair<>("Fin Corp", 30),
+                new Pair<>("Branch", 15),
+                new Pair<>("Key", 30));
+        sb.append(ph);
         Function<FinCoRegistry.D_FC_FinCo, Boolean> func = (m) -> {
-            sb.append(String.format("\t%s\n", m));
+            sb.append(String.format(ph.format(), m.getParentKey(), m.getName(), m.getKey()));
             return true;
         };
         this.getFCReg().applyToAll(func);
         updateJobSuccess(arg, sb.toString());
     }
 
+    @ActorMessageHandler
+    private void getAllAccountHolders(GetAllAccountHolders arg) {
+        StringBuffer sb = new StringBuffer();
+        PrintHeader ph = new PrintHeader(
+                new Pair<>("Fin Corp/Branch", 30),
+                new Pair<>("Account Holder", 30),
+                new Pair<>("Points", 15),
+                new Pair<>("Key", 30));
+        sb.append(ph);
+        Function<FCAccountHolderRegistry.D_FC_AccountHolder, Boolean> func = (m) -> {
+            sb.append(String.format(ph.format(), m.getParentKey(), m.getName(), m.getRewardPoints(), m.getKey()));
+            return true;
+        };
+        this.getAHReg().applyToAll(func);
+        updateJobSuccess(arg, sb.toString());
+    }
+
+    @ActorMessageHandler
+    private void getAllAccounts(GetAllAccounts arg) {
+        StringBuffer sb = new StringBuffer();
+        PrintHeader ph = new PrintHeader(
+                new Pair<>("Fin Corp/Branch/Holder", 30),
+                new Pair<>("Type", 15),
+                new Pair<>("Account Num", 45),
+                new Pair<>("Balance", 15),
+                new Pair<>("Key", 50));
+        sb.append(ph);
+        Function<FCAccountRegistry.D_FC_Account, Boolean> func = (m) -> {
+            sb.append(String.format(ph.format(), m.getParentKey(), m.getType(), m.getAccountNumber(), m.getBalance(), m.getKey()));
+            return true;
+        };
+        this.getACCReg().applyToAll(func);
+        updateJobSuccess(arg, sb.toString());
+    }
+
     /**
      * Classes used for receive method above.
      */
-    static public class AddFinCo {
-        String name;
-        String branch;
-        List<String> accountHolders;
+    static public class AddFinCos {
+        List<FCData.FinCo> finCos;
 
-        public AddFinCo(String name, String branch,
-                        List<String> accountHolders) {
-            this.name = name;
-            this.branch = branch;
-            this.accountHolders = accountHolders;
+        public AddFinCos(FCData.FinCoList fcList) {
+            this.finCos = fcList.getFinCoList();
+        }
+
+        public List<FCData.FinCo> getFinCos() {
+            return this.finCos;
         }
     }
 
     /**
-     * Base class for most FinCo requests. Must specify the bank name and bank
-     * branch as req args
+     * Base class for deferred FinCo requests. Must specify the name as req
+     * args
      */
     static public class FinCoRequest extends BasicDeferredMessage<String> {
         public static final String FINCO_NAME_KEY = "FINCO_NAME_KEY";
@@ -113,18 +161,6 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
 
         public String name() {
             return (String) arg(FINCO_NAME_KEY);
-        }
-    }
-
-    static public class FinCoResult {
-        String name;
-
-        public FinCoResult(String name) {
-            this.name = name;
-        }
-
-        public String name() {
-            return name;
         }
     }
 
@@ -140,32 +176,9 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
         }
     }
 
-    static public class GetAllAccountHoldersResult extends FinCoResult {
-        Map<String, List<String>> branchToAccountHolders;
-
-        public GetAllAccountHoldersResult(String name) {
-            super(name);
-            this.branchToAccountHolders = new HashMap<>();
-        }
-
-        public GetAllAccountHoldersResult add(String branch, String ahName) {
-            getAHNames(branch).add(ahName);
-            return this;
-        }
-
-        private List<String> getAHNames(String branch) {
-            return this.branchToAccountHolders.computeIfAbsent(branch, k -> new ArrayList<>());
-        }
-
-        public String toString() {
-            StringBuffer sb = new StringBuffer();
-            branchToAccountHolders.forEach((br, ahNames) -> {
-                ahNames.forEach(ah -> {
-                    sb.append(String.format("*** [%s/%s][AH:%s] ***, ", name()
-                            , br, ah));
-                });
-            });
-            return sb.toString();
+    static public class GetAllAccounts extends FinCoRequest {
+        public GetAllAccounts(IDeferred<String> req) {
+            super(req);
         }
     }
 }

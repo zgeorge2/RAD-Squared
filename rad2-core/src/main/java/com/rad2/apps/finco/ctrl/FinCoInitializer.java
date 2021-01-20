@@ -9,6 +9,7 @@ import akka.actor.ActorRef;
 import akka.routing.RoundRobinRoutingLogic;
 import com.rad2.akka.router.MasterRouter;
 import com.rad2.akka.router.WorkerClassArgs;
+import com.rad2.apps.finco.akka.FCAccountWorker;
 import com.rad2.apps.finco.akka.FinCoWorker;
 import com.rad2.ctrl.ControllerDependency;
 import com.rad2.ignite.common.RegistryManager;
@@ -24,10 +25,16 @@ public class FinCoInitializer implements ControllerDependency {
     }
 
     private void createWorkers(RegistryManager rm) {
-        Consumer<WorkerClassArgs> workerArgs =
+        Consumer<WorkerClassArgs> finCoWargs =
                 (args) -> args.put(FinCoWorker.BANNER_KEY, "FINCO_BANNER");
         rm.getAU().add(() -> MasterRouter.props(rm, new RoundRobinRoutingLogic(), 5,
-                FinCoWorker::props, workerArgs), FinCoWorker.FINCO_MASTER_ROUTER)
+                FinCoWorker::props, finCoWargs), FinCoWorker.FINCO_MASTER_ROUTER)
+                .tell(new MasterRouter.Initialize(), ActorRef.noSender());
+
+        Consumer<WorkerClassArgs> fcAccWargs =
+                (args) -> args.put(FCAccountWorker.BANNER_KEY, "FC_ACCOUNT_BANNER");
+        rm.getAU().add(() -> MasterRouter.props(rm, new RoundRobinRoutingLogic(), 5,
+                FCAccountWorker::props, fcAccWargs), FCAccountWorker.FC_ACCOUNT_MASTER_ROUTER)
                 .tell(new MasterRouter.Initialize(), ActorRef.noSender());
     }
 }
