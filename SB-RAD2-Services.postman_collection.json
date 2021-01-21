@@ -224,9 +224,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "List Operations",
@@ -429,9 +427,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Purchase Ops",
@@ -556,9 +552,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Misc Ops",
@@ -863,350 +857,49 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
 			]
 		},
 		{
-			"name": "Investment Club Ops",
-			"item": [
-				{
-					"name": "SB-ICApp-LAXOps",
-					"item": [
-						{
-							"name": "BulkCreateClubs",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"ics\": [{\n\t\t\"name\": \"IC1\",\n\t\t\"members\": [\"Adam\", \"Abigail\", \"Alex\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Adam_TD_1\",\n\t\t\t\"member\":\"Adam\",\n\t\t\t\"principal\":\"10000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"12000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Abigail_TD_1\",\n\t\t\t\"member\":\"Abigail\",\n\t\t\t\"principal\":\"20000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"22000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Abigail_TD_2\",\n\t\t\t\"member\":\"Abigail\",\n\t\t\t\"principal\":\"25000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"27000\"\n\t\t}]\n\t},\n\t{\n\t\t\"name\": \"IC2\",\n\t\t\"members\": [\"Adrian\", \"Anne\", \"Alfred\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Adrian_TD_1\",\n\t\t\t\"member\":\"Adrian\",\n\t\t\t\"principal\":\"30000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"32000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Anne_TD_1\",\n\t\t\t\"member\":\"Anne\",\n\t\t\t\"principal\":\"40000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"42000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Anne_TD_2\",\n\t\t\t\"member\":\"Anne\",\n\t\t\t\"principal\":\"50000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"52000\"\n\t\t}]\n\t}]\n}"
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/bulk",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"bulk"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "BulkProvideAdvice",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"adviceList\": [\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Alex\",\n            \"termDeposit\": \"Alex_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Abigail\",\n            \"toMember\": \"Alex\",\n            \"termDeposit\": \"Alex_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Alex\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC2\",\n            \"fromMember\": \"Adrian\",\n            \"toMember\": \"Anne\",\n            \"termDeposit\": \"Anne_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC2\",\n            \"fromMember\": \"Adrian\",\n            \"toMember\": \"Anne\",\n            \"termDeposit\": \"Anne_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        }\n    ]\n}"
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/advice/bulk",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"advice",
-										"bulk"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SelectFromOfferedAdvice IC1_LAX",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/IC1/selectFromAdvice",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"IC1",
-										"selectFromAdvice"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SelectFromOfferedAdvice IC3_NYC",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/IC3/selectFromAdvice",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"IC3",
-										"selectFromAdvice"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "CreateClub",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/LaTiendaInvestmentClub",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"LaTiendaInvestmentClub"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "CreateMember",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9080/vap/ic/LaTiendaInvestmentClub/member/Alex",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"ic",
-										"LaTiendaInvestmentClub",
-										"member",
-										"Alex"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "SB-ICApp-NYCOps",
-					"item": [
-						{
-							"name": "BulkCreateClubs",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"ics\": [{\n\t\t\"name\": \"IC3\",\n\t\t\"members\": [\"Brian\", \"Bach\", \"Bush\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Brian_TD_1\",\n\t\t\t\"member\":\"Brian\",\n\t\t\t\"principal\":\"10000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"12000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bach_TD_1\",\n\t\t\t\"member\":\"Bach\",\n\t\t\t\"principal\":\"20000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"22000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bach_TD_2\",\n\t\t\t\"member\":\"Bach\",\n\t\t\t\"principal\":\"25000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"27000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bush_TD_1\",\n\t\t\t\"member\":\"Bush\",\n\t\t\t\"principal\":\"35000\",\n\t\t\t\"termInYears\": \"4\",\n\t\t\t\"expectedAmount\":\"37000\"\n\t\t}]\n\t},\n\t{\n\t\t\"name\": \"IC4\",\n\t\t\"members\": [\"Baker\", \"Bruce\", \"Bren\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Baker_TD_1\",\n\t\t\t\"member\":\"Baker\",\n\t\t\t\"principal\":\"30000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"32000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bruce_TD_1\",\n\t\t\t\"member\":\"Bruce\",\n\t\t\t\"principal\":\"35000\",\n\t\t\t\"termInYears\": \"4\",\n\t\t\t\"expectedAmount\":\"37000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bren_TD_1\",\n\t\t\t\"member\":\"Bren\",\n\t\t\t\"principal\":\"40000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"42000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bren_TD_2\",\n\t\t\t\"member\":\"Bren\",\n\t\t\t\"principal\":\"50000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"52000\"\n\t\t}]\n\t}]\n}"
-								},
-								"url": {
-									"raw": "http://localhost:9090/vap/ic/bulk",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9090",
-									"path": [
-										"vap",
-										"ic",
-										"bulk"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "BulkProvideAdvice",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"adviceList\": [\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bush\",\n            \"termDeposit\": \"Bush_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Bush\",\n            \"toMember\": \"Brian\",\n            \"termDeposit\": \"Brian_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Bush\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC4\",\n            \"fromMember\": \"Baker\",\n            \"toMember\": \"Bruce\",\n            \"termDeposit\": \"Bruce_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC4\",\n            \"fromMember\": \"Baker\",\n            \"toMember\": \"Bren\",\n            \"termDeposit\": \"Bren_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        }\n    ]\n}"
-								},
-								"url": {
-									"raw": "http://localhost:9090/vap/ic/advice/bulk",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9090",
-									"path": [
-										"vap",
-										"ic",
-										"advice",
-										"bulk"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SelectFromOfferedAdvice IC1_LAX",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9090/vap/ic/IC1/selectFromAdvice",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9090",
-									"path": [
-										"vap",
-										"ic",
-										"IC1",
-										"selectFromAdvice"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SelectFromOfferedAdvice IC3_NYC",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "http://localhost:9090/vap/ic/IC3/selectFromAdvice",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9090",
-									"path": [
-										"vap",
-										"ic",
-										"IC3",
-										"selectFromAdvice"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				}
-			]
-		},
-		{
-			"name": "Independent Bank Ops",
+			"name": "Financial Company Ops",
 			"item": [
 				{
 					"name": "SB-BankApp-LAXOps",
 					"item": [
 						{
-							"name": "SB - AddLocalBanksAndAccountHolders",
+							"name": "SB - getJobResult",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/adm/getJobResult/AkkaSEA/JT_e9a98163-6c85-469a-a3d4-3f5e64cecd39",
+									"protocol": "http",
+									"host": [
+										"{{HOSTNAME}}"
+									],
+									"port": "{{LBPORT}}",
+									"path": [
+										"adm",
+										"getJobResult",
+										"AkkaSEA",
+										"JT_e9a98163-6c85-469a-a3d4-3f5e64cecd39"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddFinCos",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "bb2379ff-63f0-4a2b-9e7b-e3a6662bd6ed",
 										"exec": [
 											""
 										],
@@ -1224,27 +917,42 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+									"raw": "{\n    \"finCoList\": [\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank1\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Adam\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Abigail\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Alexander\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank2\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Adrian\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Anne\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Alfred\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank3\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Bob\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Baron\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank4\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Barton\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Brother\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank5\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Charlie\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Chester\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank6\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Cox\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Caruthers\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"100\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"CountryBank\",\n            \"branch\": \"Bank1\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Adam\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"200\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"200\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"200\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"Abigail\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"200\"\n                        },\n                        {\n                            \"type\": \"NRO\",\n                            \"balance\": \"200\"\n                        },\n                        {\n                            \"type\": \"SAVINGS\",\n                            \"balance\": \"200\"\n                        }\n                    ]\n                }\n            ]\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
-									"raw": "http://localhost:9080/vap/bank",
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"{{HOSTNAME}}"
 									],
-									"port": "9080",
+									"port": "{{LBPORT}}",
 									"path": [
-										"vap",
-										"bank"
+										"fin"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "SB - AddIntraAccountTransaction NRE->NRO",
+							"name": "SB - AddFinCosSmall",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
-								"method": "PUT",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -1253,35 +961,109 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": ""
+									"raw": "{\n    \"finCoList\": [\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank1\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Adam\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"name\": \"VillageBank\",\n            \"branch\": \"Bank2\",\n            \"accountHolders\": [\n                {\n                    \"name\": \"Adrian\",\n                    \"accounts\": [\n                        {\n                            \"type\": \"NRE\",\n                            \"balance\": \"100\"\n                        }\n                    ]\n                }\n            ]\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
-									"raw": "http://localhost:9080/vap/bank/Bank1/accountHolder/Adam/account/NRE/transferTo/NRO/10",
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"{{HOSTNAME}}"
 									],
-									"port": "9080",
+									"port": "{{LBPORT}}",
 									"path": [
-										"vap",
-										"bank",
-										"Bank1",
-										"accountHolder",
-										"Adam",
-										"account",
-										"NRE",
-										"transferTo",
-										"NRO",
-										"10"
+										"fin"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "SB - AddIntraAccountTransaction NRO->NRE",
+							"name": "GetAllBranches",
 							"request": {
-								"method": "PUT",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/VillageBank/getAllBranches",
+									"protocol": "http",
+									"host": [
+										"{{HOSTNAME}}"
+									],
+									"port": "{{LBPORT}}",
+									"path": [
+										"fin",
+										"VillageBank",
+										"getAllBranches"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAllAccountHolders",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/VillageBank/getAllAccountHolders",
+									"protocol": "http",
+									"host": [
+										"{{HOSTNAME}}"
+									],
+									"port": "{{LBPORT}}",
+									"path": [
+										"fin",
+										"VillageBank",
+										"getAllAccountHolders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAllAccounts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/VillageBank/getAllAccounts",
+									"protocol": "http",
+									"host": [
+										"{{HOSTNAME}}"
+									],
+									"port": "{{LBPORT}}",
+									"path": [
+										"fin",
+										"VillageBank",
+										"getAllAccounts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - MultipleTransfers",
+							"request": {
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -1290,26 +1072,47 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": ""
+									"raw": "{\n    \"transfers\": [\n        {\n            \"from\": \"VillageBank/Bank1/Adam/NRE\",\n            \"to\": \"VillageBank/Bank1/Adam/NRO\",\n            \"amount\": 10\n        },\n        {\n            \"from\": \"VillageBank/Bank1/Adam/NRO\",\n            \"to\": \"VillageBank/Bank1/Adam/NRE\",\n            \"amount\": 10\n        },\n        {\n            \"from\": \"VillageBank/Bank1/Adam/NRE\",\n            \"to\": \"VillageBank/Bank3/Bob/NRE\",\n            \"amount\": 10\n        },\n        {\n            \"from\": \"VillageBank/Bank3/Bob/NRE\",\n            \"to\": \"VillageBank/Bank5/Charlie/NRE\",\n            \"amount\": 10\n        },\n        {\n            \"from\": \"VillageBank/Bank5/Charlie/NRE\",\n            \"to\": \"VillageBank/Bank1/Adam/NRE\",\n            \"amount\": 10\n        }\n    ]\n}"
 								},
 								"url": {
-									"raw": "http://localhost:9080/vap/bank/Bank1/accountHolder/Adam/account/NRO/transferTo/NRE/10",
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/doTransfers",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"{{HOSTNAME}}"
 									],
-									"port": "9080",
+									"port": "{{LBPORT}}",
 									"path": [
-										"vap",
-										"bank",
-										"Bank1",
-										"accountHolder",
-										"Adam",
-										"account",
-										"NRO",
-										"transferTo",
-										"NRE",
-										"10"
+										"fin",
+										"doTransfers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - MultipleTransfersSmall",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"transfers\": [\n        {\n            \"from\": \"VillageBank/Bank1/Adam/NRE\",\n            \"to\": \"VillageBank/Bank2/Adrian/NRE\",\n            \"amount\": 10\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/doTransfers",
+									"protocol": "http",
+									"host": [
+										"{{HOSTNAME}}"
+									],
+									"port": "{{LBPORT}}",
+									"path": [
+										"fin",
+										"doTransfers"
 									]
 								}
 							},
@@ -1330,15 +1133,15 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "http://localhost:9080/vap/bank/accrueInterest",
+									"raw": "http://{{HOSTNAME}}:{{LBPORT}}/fin/VillageBank/accrueInterest",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"{{HOSTNAME}}"
 									],
-									"port": "9080",
+									"port": "{{LBPORT}}",
 									"path": [
-										"vap",
-										"bank",
+										"fin",
+										"VillageBank",
 										"accrueInterest"
 									]
 								}
@@ -1378,39 +1181,11 @@
 							"response": []
 						},
 						{
-							"name": "SB - getJobResult",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:9080/adm/getJobResult/AkkaLAX/JT_9923fe6a-0e9f-4eab-8c02-965b7ae64849",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"adm",
-										"getJobResult",
-										"AkkaLAX",
-										"JT_9923fe6a-0e9f-4eab-8c02-965b7ae64849"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "SB - BankApp-Greeting",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "2f471ba7-8135-4124-881d-c4d0d7bc64f0",
 										"exec": [
 											""
 										],
@@ -1443,32 +1218,6 @@
 										"greeting",
 										"zgeorge",
 										"zac"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SB - PrintLocalBank Bank1",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:9080/vap/bank/Bank1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9080",
-									"path": [
-										"vap",
-										"bank",
-										"Bank1"
 									]
 								}
 							},
@@ -1635,8 +1384,7 @@
 							},
 							"response": []
 						}
-					],
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "SB-BankApp-NYCOps",
@@ -1785,7 +1533,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:9090/adm/getJobResult/AkkaNYC/JT_68f079e9-0fb1-499c-b4ea-92ea6d2c7283",
+									"raw": "http://localhost:9090/adm/getJobResult/AkkaNYC/JT_38ba8f11-bef0-4753-998f-4c29f58df069",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1795,7 +1543,7 @@
 										"adm",
 										"getJobResult",
 										"AkkaNYC",
-										"JT_68f079e9-0fb1-499c-b4ea-92ea6d2c7283"
+										"JT_38ba8f11-bef0-4753-998f-4c29f58df069"
 									]
 								}
 							},
@@ -1889,7 +1637,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b743de99-5de2-4ecc-885e-428a7b169e6e",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1899,15 +1646,13 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8a19ce84-8366-403d-9678-fed73ddb00d1",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					],
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "SB-BankApp-SEA Ops",
@@ -2160,7 +1905,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b743de99-5de2-4ecc-885e-428a7b169e6e",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2170,15 +1914,1315 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8a19ce84-8366-403d-9678-fed73ddb00d1",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Investment Club Ops",
+			"item": [
+				{
+					"name": "SB-ICApp-LAXOps",
+					"item": [
+						{
+							"name": "BulkCreateClubs",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"ics\": [{\n\t\t\"name\": \"IC1\",\n\t\t\"members\": [\"Adam\", \"Abigail\", \"Alex\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Adam_TD_1\",\n\t\t\t\"member\":\"Adam\",\n\t\t\t\"principal\":\"10000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"12000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Abigail_TD_1\",\n\t\t\t\"member\":\"Abigail\",\n\t\t\t\"principal\":\"20000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"22000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Abigail_TD_2\",\n\t\t\t\"member\":\"Abigail\",\n\t\t\t\"principal\":\"25000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"27000\"\n\t\t}]\n\t},\n\t{\n\t\t\"name\": \"IC2\",\n\t\t\"members\": [\"Adrian\", \"Anne\", \"Alfred\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Adrian_TD_1\",\n\t\t\t\"member\":\"Adrian\",\n\t\t\t\"principal\":\"30000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"32000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Anne_TD_1\",\n\t\t\t\"member\":\"Anne\",\n\t\t\t\"principal\":\"40000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"42000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Anne_TD_2\",\n\t\t\t\"member\":\"Anne\",\n\t\t\t\"principal\":\"50000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"52000\"\n\t\t}]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/bulk",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BulkProvideAdvice",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"adviceList\": [\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Adam\",\n            \"toMember\": \"Alex\",\n            \"termDeposit\": \"Alex_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Abigail\",\n            \"toMember\": \"Alex\",\n            \"termDeposit\": \"Alex_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC1\",\n            \"fromMember\": \"Alex\",\n            \"toMember\": \"Abigail\",\n            \"termDeposit\": \"Abigail_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC2\",\n            \"fromMember\": \"Adrian\",\n            \"toMember\": \"Anne\",\n            \"termDeposit\": \"Anne_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC2\",\n            \"fromMember\": \"Adrian\",\n            \"toMember\": \"Anne\",\n            \"termDeposit\": \"Anne_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/advice/bulk",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"advice",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SelectFromOfferedAdvice IC1_LAX",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/IC1/selectFromAdvice",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"IC1",
+										"selectFromAdvice"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SelectFromOfferedAdvice IC3_NYC",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/IC3/selectFromAdvice",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"IC3",
+										"selectFromAdvice"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreateClub",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/LaTiendaInvestmentClub",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"LaTiendaInvestmentClub"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreateMember",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/ic/LaTiendaInvestmentClub/member/Alex",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"ic",
+										"LaTiendaInvestmentClub",
+										"member",
+										"Alex"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SB-ICApp-NYCOps",
+					"item": [
+						{
+							"name": "BulkCreateClubs",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"ics\": [{\n\t\t\"name\": \"IC3\",\n\t\t\"members\": [\"Brian\", \"Bach\", \"Bush\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Brian_TD_1\",\n\t\t\t\"member\":\"Brian\",\n\t\t\t\"principal\":\"10000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"12000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bach_TD_1\",\n\t\t\t\"member\":\"Bach\",\n\t\t\t\"principal\":\"20000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"22000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bach_TD_2\",\n\t\t\t\"member\":\"Bach\",\n\t\t\t\"principal\":\"25000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"27000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bush_TD_1\",\n\t\t\t\"member\":\"Bush\",\n\t\t\t\"principal\":\"35000\",\n\t\t\t\"termInYears\": \"4\",\n\t\t\t\"expectedAmount\":\"37000\"\n\t\t}]\n\t},\n\t{\n\t\t\"name\": \"IC4\",\n\t\t\"members\": [\"Baker\", \"Bruce\", \"Bren\"],\n\t\t\"termDeposits\": [{\n\t\t\t\"name\":\"Baker_TD_1\",\n\t\t\t\"member\":\"Baker\",\n\t\t\t\"principal\":\"30000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"32000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bruce_TD_1\",\n\t\t\t\"member\":\"Bruce\",\n\t\t\t\"principal\":\"35000\",\n\t\t\t\"termInYears\": \"4\",\n\t\t\t\"expectedAmount\":\"37000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bren_TD_1\",\n\t\t\t\"member\":\"Bren\",\n\t\t\t\"principal\":\"40000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"42000\"\n\t\t},\n\t\t{\n\t\t\t\"name\":\"Bren_TD_2\",\n\t\t\t\"member\":\"Bren\",\n\t\t\t\"principal\":\"50000\",\n\t\t\t\"termInYears\": \"5\",\n\t\t\t\"expectedAmount\":\"52000\"\n\t\t}]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/ic/bulk",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"ic",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BulkProvideAdvice",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"adviceList\": [\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Brian\",\n            \"toMember\": \"Bush\",\n            \"termDeposit\": \"Bush_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Bush\",\n            \"toMember\": \"Brian\",\n            \"termDeposit\": \"Brian_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC3\",\n            \"fromMember\": \"Bush\",\n            \"toMember\": \"Bach\",\n            \"termDeposit\": \"Bach_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC4\",\n            \"fromMember\": \"Baker\",\n            \"toMember\": \"Bruce\",\n            \"termDeposit\": \"Bruce_TD_1\",\n            \"adviceDetails\": \"Some advice\"\n        },\n        {\n            \"icName\": \"IC4\",\n            \"fromMember\": \"Baker\",\n            \"toMember\": \"Bren\",\n            \"termDeposit\": \"Bren_TD_2\",\n            \"adviceDetails\": \"Some advice\"\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/ic/advice/bulk",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"ic",
+										"advice",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SelectFromOfferedAdvice IC1_LAX",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/ic/IC1/selectFromAdvice",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"ic",
+										"IC1",
+										"selectFromAdvice"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SelectFromOfferedAdvice IC3_NYC",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/ic/IC3/selectFromAdvice",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"ic",
+										"IC3",
+										"selectFromAdvice"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Independent Bank Ops",
+			"item": [
+				{
+					"name": "SB-BankApp-LAXOps",
+					"item": [
+						{
+							"name": "SB - AddLocalBanksAndAccountHolders",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRE->NRO",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1/accountHolder/Adam/account/NRE/transferTo/NRO/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1",
+										"accountHolder",
+										"Adam",
+										"account",
+										"NRE",
+										"transferTo",
+										"NRO",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRO->NRE",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1/accountHolder/Adam/account/NRO/transferTo/NRE/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1",
+										"accountHolder",
+										"Adam",
+										"account",
+										"NRO",
+										"transferTo",
+										"NRE",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AccrueInterestInAllAccounts",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/accrueInterest",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"accrueInterest"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddAccountHolder Mr Orange",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1/accountHolder/MrOrange",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1",
+										"accountHolder",
+										"MrOrange"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - getJobResult",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/adm/getJobResult/AkkaLAX/JT_07ed3188-715b-4982-8951-503895dee4f2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"adm",
+										"getJobResult",
+										"AkkaLAX",
+										"JT_07ed3188-715b-4982-8951-503895dee4f2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - BankApp-Greeting",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/greeting/zgeorge/zac",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"greeting",
+										"zgeorge",
+										"zac"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintLocalBank Bank1",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintBankBySelection AkkaLAX/Bank1",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1/printBankBySelection",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1",
+										"printBankBySelection"
+									]
+								},
+								"description": "Uses named queries with the System Name and Bank name as the arguments. Tests named queries described in application.conf.\nThis request can be sent to any node in the cluster."
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintRemoteBank Bank3",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank3"
+									]
+								},
+								"description": "Uses named queries with the System Name and Bank name as the arguments. Tests named queries described in application.conf.\nThis request can be sent to any node in the cluster."
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintAllLocalBanks",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - GetAllAccountHoldersOfBank",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/Bank1/getAllAccountHolders",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank1",
+										"getAllAccountHolders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - GetAllAccountHoldersTimed5",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/getAllAccountHolders/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"getAllAccountHolders",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - GetAllAccountHoldersTimed1",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9080/vap/bank/getAllAccountHolders/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9080",
+									"path": [
+										"vap",
+										"bank",
+										"getAllAccountHolders",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SB-BankApp-NYCOps",
+					"item": [
+						{
+							"name": "SB - AddLocalBanksAndAccountHolders",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank3\",\n\t\t\"accountHolders\": [\"Bob\", \"Baron\"]\n\t},\n\t{\n\t\t\"name\": \"Bank4\",\n\t\t\"accountHolders\": [\"Barton\", \"Brother\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRE->NRO",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/bank/Bank3/accountHolder/Bob/account/NRE/transferTo/NRO/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank",
+										"Bank3",
+										"accountHolder",
+										"Bob",
+										"account",
+										"NRE",
+										"transferTo",
+										"NRO",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRO->NRE",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/bank/Bank3/accountHolder/Bob/account/NRO/transferTo/NRE/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank",
+										"Bank3",
+										"accountHolder",
+										"Bob",
+										"account",
+										"NRO",
+										"transferTo",
+										"NRE",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AccrueInterestInAllAccounts",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/bank/accrueInterest",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank",
+										"accrueInterest"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - getJobResult",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9090/adm/getJobResult/AkkaNYC/JT_38ba8f11-bef0-4753-998f-4c29f58df069",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"adm",
+										"getJobResult",
+										"AkkaNYC",
+										"JT_38ba8f11-bef0-4753-998f-4c29f58df069"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - BankApp-Greeting",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:9090/vap/bank/greeting/zgeorge/zac",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank",
+										"greeting",
+										"zgeorge",
+										"zac"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintLocalBank Bank3",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9090/vap/bank/Bank3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank",
+										"Bank3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintAllLocalBanks",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:9090/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						}
 					],
-					"_postman_isSubFolder": true
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "SB-BankApp-SEA Ops",
+					"item": [
+						{
+							"name": "SB - AddLocalBanksAndAccountHolders",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank5\",\n\t\t\"accountHolders\": [\"Charlie\", \"Chester\"]\n\t},\n\t{\n\t\t\"name\": \"Bank6\",\n\t\t\"accountHolders\": [\"Cox\", \"Caruthers\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:10080/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRE->NRO",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:10080/vap/bank/Bank5/accountHolder/Charlie/account/NRE/transferTo/NRO/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank5",
+										"accountHolder",
+										"Charlie",
+										"account",
+										"NRE",
+										"transferTo",
+										"NRO",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AddIntraAccountTransaction NRO->NRE",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:10080/vap/bank/Bank5/accountHolder/Charlie/account/NRO/transferTo/NRE/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank5",
+										"accountHolder",
+										"Charlie",
+										"account",
+										"NRO",
+										"transferTo",
+										"NRE",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - AccrueInterestInAllAccounts",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:10080/vap/bank/accrueInterest",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank",
+										"accrueInterest"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - getJobResult",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:10080/adm/getJobResult/AkkaNYC/JT_68f079e9-0fb1-499c-b4ea-92ea6d2c7283",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"adm",
+										"getJobResult",
+										"AkkaNYC",
+										"JT_68f079e9-0fb1-499c-b4ea-92ea6d2c7283"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - BankApp-Greeting",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"banks\": [{\n\t\t\"name\": \"Bank1\",\n\t\t\"accountHolders\": [\"Adam\", \"Abigail\", \"Alexander\"]\n\t},\n\t{\n\t\t\"name\": \"Bank2\",\n\t\t\"accountHolders\": [\"Adrian\", \"Anne\", \"Alfred\"]\n\t}]\n}"
+								},
+								"url": {
+									"raw": "http://localhost:10080/vap/bank/greeting/zgeorge/zac",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank",
+										"greeting",
+										"zgeorge",
+										"zac"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintLocalBank Bank5",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:10080/vap/bank/Bank5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank",
+										"Bank5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SB - PrintAllLocalBanks",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:10080/vap/bank",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "10080",
+									"path": [
+										"vap",
+										"bank"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
 				}
 			]
 		},
@@ -2382,7 +3426,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:9080/vap/bank/getAllAccountHolders",
+							"raw": "http://localhost:9080/vap/bank/getAllAccountHolders/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -2391,7 +3435,8 @@
 							"path": [
 								"vap",
 								"bank",
-								"getAllAccountHolders"
+								"getAllAccountHolders",
+								"1"
 							]
 						}
 					},
@@ -2437,7 +3482,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "e7a530db-1d69-4237-abbb-c2b3d30921d0",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2447,15 +3491,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "65b88692-4e93-467f-bd55-ac9d987225e0",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "BANK SCALE OPS",
@@ -2524,7 +3566,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "e7a530db-1d69-4237-abbb-c2b3d30921d0",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2534,15 +3575,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "65b88692-4e93-467f-bd55-ac9d987225e0",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"auth": {
@@ -2573,7 +3612,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "f67fdf92-ff19-4a51-9a1e-b5499264cdd4",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -2583,13 +3621,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "9b8db451-c1e4-448d-8ae6-4282f7881e3c",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
