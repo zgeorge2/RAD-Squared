@@ -35,5 +35,5 @@ hs_err_pid*
 test-output
 
 # ignite work directories
-rad2-sb/ignite
-ignite
+ignite/work
+ignite/README.txt
