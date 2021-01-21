@@ -10,14 +10,17 @@ import akka.actor.Props;
 import com.rad2.akka.aspects.ActorMessageHandler;
 import com.rad2.akka.common.BaseActorWithTimer;
 import com.rad2.apps.finco.ignite.FCAccountRegistry;
+import com.rad2.common.utils.Pair;
 import com.rad2.common.utils.PrintUtils;
 import com.rad2.ctrl.deps.IJobRef;
 import com.rad2.ignite.common.RegistryManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 /**
  * A MoneyTransfer Actor is always created to coordinate a list of transfers.
@@ -27,19 +30,29 @@ import java.util.concurrent.TimeUnit;
  */
 public class FCMoneyTransfer extends BaseActorWithTimer {
     private static final long TICK_TIME = 1000; // unit: millis
-    private IJobRef jr; // to track ALL the operations done by this MT
-    private final List<FCData.FCTransfer> transfers;
-    private int transferCount;
+    private final IJobRef jr; // to track ALL the operations done by this MT
+    private final List<Pair<String, FCData.FCTransfer>> transfers;
     private final Map<String, Boolean> debits; // status of all debits
     private final Map<String, Boolean> credits; // status of all credits
 
-    public FCMoneyTransfer(RegistryManager rm, IJobRef jr, List<FCData.FCTransfer> transfers) {
+    public FCMoneyTransfer(RegistryManager rm, IJobRef jr, List<FCData.FCTransfer> tList) {
         super(rm, new Tick(TickTypeEnum.PERIODIC, jr.regId(), TICK_TIME, TimeUnit.MILLISECONDS));
         this.jr = jr;
-        this.transfers = transfers;
-        this.transferCount = 0;
+        this.transfers = new ArrayList<>();
         this.debits = new HashMap<>();
         this.credits = new HashMap<>();
+        init(tList);
+    }
+
+    private void init(List<FCData.FCTransfer> tList) {
+        IntStream.range(0, tList.size()).forEach(i -> {
+            FCData.FCTransfer t = tList.get(i);
+            String tid = String.format("FC_TRANS_%d/%d_%d_FROM_%s_TO_%s",
+                    i, tList.size(), t.getAmount(), t.getFrom(), t.getTo());
+            transfers.add(new Pair<>(tid, t));
+            debits.put(tid, false);
+            credits.put(tid, false);
+        });
     }
 
     static public Props props(RegistryManager rm, IJobRef jr, List<FCData.FCTransfer> transfers) {
@@ -85,8 +98,9 @@ public class FCMoneyTransfer extends BaseActorWithTimer {
         this.context().stop(self());
     }
 
-    private void transfer(FCData.FCTransfer t) {
-        String tid = getTid(t);
+    private void transfer(Pair<String, FCData.FCTransfer> trPair) {
+        String tid = trPair.getLeft();
+        FCData.FCTransfer t = trPair.getRight();
         if (t.getFrom() == null || t.getTo() == null) {
             PrintUtils.print("Cannot validate and complete transfer. Account setup is pending!");
             return; // the from/to accounts need to be non-null
@@ -95,20 +109,13 @@ public class FCMoneyTransfer extends BaseActorWithTimer {
         getFCAccountRouter().tell(new FCAccountWorker.Debit(tid, t, String.format("DEBITED FROM: %s", t.getFrom())), self());
         // credit the toAccount
         getFCAccountRouter().tell(new FCAccountWorker.Credit(tid, t, String.format("CREDITED TO: %s", t.getTo())), self());
-
-        // this is the last use of this Actor - terminate it.
-        //self().tell(new Terminate(), self());
-    }
-
-    private String getTid(FCData.FCTransfer t) {
-        return String.format("FC_TRANS_%d/%d [%s] FROM [%s] TO [%s]",
-                transferCount++, transfers.size(), t.getAmount(), t.getFrom(), t.getTo());
     }
 
     private boolean isReady(Tick tick) {
         boolean ret = true;
-        for (FCData.FCTransfer t : transfers) {
-            String tid = getTid(t);
+        for (Pair<String, FCData.FCTransfer> trPair : transfers) {
+            String tid = trPair.getLeft();
+            FCData.FCTransfer t = trPair.getRight();
             ret = ret && debits.get(tid);
             ret = ret && credits.get(tid);
         }

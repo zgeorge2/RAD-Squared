@@ -100,16 +100,16 @@ public class FCData {
         }
     }
 
-    public static class FCTransferList extends FCData {
-        private final List<FCTransfer> transferList;
+    public static class FCTransfers extends FCData {
+        private final List<FCTransfer> transfers;
 
-        public FCTransferList() {
-            this.transferList = new ArrayList<>();
+        public FCTransfers() {
+            this.transfers = new ArrayList<>();
         }
 
         @JsonProperty
-        public List<FCTransfer> getTransferList() {
-            return transferList;
+        public List<FCTransfer> getTransfers() {
+            return transfers;
         }
     }
 

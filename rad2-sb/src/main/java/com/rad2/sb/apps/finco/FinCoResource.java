@@ -53,10 +53,17 @@ public class FinCoResource extends BaseResource<FinCoController> {
     }
 
     @PostMapping("/doTransfers")
-    public DeferredResult<ResponseEntity<String>> doTransfers(@RequestBody FCData.FCTransferList dto) {
+    public DeferredResult<ResponseEntity<String>> doTransfers(@RequestBody FCData.FCTransfers dto) {
         logger.info("POST /fin/doTransfers");
         return createRequest(req -> req.putArg(FCAccountWorker.DoTransfers.FC_TRANSFERS_KEY, dto),
                 req -> getC().doTransfers(req));
+    }
+
+    @PostMapping("/{fcn}/accrueInterest")
+    public DeferredResult<ResponseEntity<String>> accrueInterest(@PathVariable("fcn") String fcn) {
+        logger.info(String.format("GET /fin/{%s}/accrueInterest", fcn));
+        return createRequest(req -> req.putArg(FCAccountWorker.AccrueInterest.FINCO_NAME_KEY, fcn),
+                req -> getC().accrueInterest(req));
     }
 
     /**

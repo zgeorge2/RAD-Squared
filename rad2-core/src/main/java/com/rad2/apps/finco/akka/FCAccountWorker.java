@@ -68,13 +68,14 @@ public class FCAccountWorker extends BaseActor implements WorkerActor,
 
     @ActorMessageHandler
     private void credit(Credit c) {
-        this.getACCReg().creditAccount(c.tr.getFrom(), c.tr.getAmount(), c.details);
-        sender().tell(new FCMoneyTransfer.DebitStatus(c.transferId, true), self());
+        this.getACCReg().creditAccount(c.tr.getTo(), c.tr.getAmount(), c.details);
+        sender().tell(new FCMoneyTransfer.CreditStatus(c.transferId, true), self());
     }
 
     @ActorMessageHandler
     private void accrueInterest(AccrueInterest c) {
-        //this.getACCReg().accrueInterest(c.getAccountKey());
+        this.getACCReg().accrueInterest(c.finCo());
+        updateJobSuccess(c, "INT CREDITED to ALL ACCOUNTS");
     }
 
     /**
@@ -88,44 +89,49 @@ public class FCAccountWorker extends BaseActor implements WorkerActor,
         }
 
         public List<FCData.FCTransfer> getTransfers() {
-            return ((FCData.FCTransferList) arg(FC_TRANSFERS_KEY)).getTransferList();
+            return ((FCData.FCTransfers) arg(FC_TRANSFERS_KEY)).getTransfers();
         }
     }
 
-    static public class AccountOp {
+    static public class MultiAccountOp {
         final String transferId;
         final FCData.FCTransfer tr;
         final String details;
 
-        public AccountOp(String transferId, FCData.FCTransfer tr, String details) {
+        public MultiAccountOp(String transferId, FCData.FCTransfer tr, String details) {
             this.transferId = transferId;
             this.tr = tr;
             this.details = details;
         }
     }
 
-    static public class AccrueInterest {
-        private static final int DEFAULT_INTEREST_RATE = 8;
-        int percent;
-
-        public AccrueInterest(IDeferred<String> req) {
-            this(req, DEFAULT_INTEREST_RATE);
-        }
-
-        public AccrueInterest(IDeferred<String> req, int percent) {
-            this.percent = percent;
-        }
-    }
-
-    static public class Credit extends AccountOp {
+    static public class Credit extends MultiAccountOp {
         public Credit(String transferId, FCData.FCTransfer t, String details) {
             super(transferId, t, details);
         }
     }
 
-    static public class Debit extends AccountOp {
+    static public class Debit extends MultiAccountOp {
         public Debit(String transferId, FCData.FCTransfer t, String details) {
             super(transferId, t, details);
+        }
+    }
+
+    static public class AccountOp extends BasicDeferredMessage<String> {
+        public static final String FINCO_NAME_KEY = "FINCO_NAME_KEY";
+
+        public AccountOp(IDeferred<String> req) {
+            super(req);
+        }
+
+        public String finCo() {
+            return (String) arg(FINCO_NAME_KEY);
+        }
+    }
+
+    static public class AccrueInterest extends AccountOp {
+        public AccrueInterest(IDeferred<String> req) {
+            super(req);
         }
     }
 }
