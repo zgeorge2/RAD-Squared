@@ -50,6 +50,11 @@ public class FinCoController extends BaseController {
         fcar.tell(new FCAccountWorker.DoTransfers(req), ActorRef.noSender());
     }
 
+    public void addAccountHolders(IDeferred<String> req) {
+        ActorSelection fcr = getFinCoRouter();
+        fcr.tell(new FinCoWorker.AddAccountHolders(req), ActorRef.noSender());
+    }
+
     public void accrueInterest(IDeferred<String> req) {
         ActorSelection fcar = getFCAccountRouter();
         fcar.tell(new FCAccountWorker.AccrueInterest(req), ActorRef.noSender());

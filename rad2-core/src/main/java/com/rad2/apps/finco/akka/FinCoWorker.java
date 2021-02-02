@@ -59,6 +59,7 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
         return super.createReceive()
                 .orElse(receiveBuilder()
                         .match(AddFinCos.class, this::addFinCoList)
+                        .match(AddAccountHolders.class, this::addAccountHolders)
                         .match(GetAllBranches.class, this::getAllBranches)
                         .match(GetAllAccountHolders.class, this::getAllAccountHolders)
                         .match(GetAllAccounts.class, this::getAllAccounts)
@@ -71,15 +72,15 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
         arg.getFinCos().forEach(fc -> {
             String fcRegId =
                     getFCReg().add(new FinCoRegistry.FinCoRegistryStateDTO(fc.getName(), fc.getBranch()));
-            // use the fcRegId of the finco as parent key for each account holder
-            fc.getAccountHolders().forEach(ah -> {
-                String ahRegId = getAHReg().add(new FCAccountHolderRegistry.FCAccountHolderRegistryStateDTO(fcRegId, ah.getName()));
-                // use the fcRegId of the finco as parent key for each account holder
-                ah.getAccounts().forEach(acc -> {
-                    getACCReg().createAccount(ahRegId, acc.getType(), acc.getBalance());
-                });
-            });
+            addAccountHoldersHelper(fcRegId, fc.getAccountHolders());
         });
+    }
+
+    @ActorMessageHandler
+    private void addAccountHolders(AddAccountHolders arg) {
+        // create the registry entry for each finco
+        arg.getFinCoByIdList().forEach(fc -> addAccountHoldersHelper(fc.getFinCoId(), fc.getAccountHolders()));
+        updateJobSuccess(arg, "ADDED ALL ACCOUNTS");
     }
 
     @ActorMessageHandler
@@ -133,6 +134,15 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
         updateJobSuccess(arg, sb.toString());
     }
 
+    private void addAccountHoldersHelper(String fcRegId, List<FCData.FCAccHol> accountHolders) {
+        // use the fcRegId of the finco as parent key for each account holder
+        accountHolders.forEach(ah -> {
+            String ahRegId = getAHReg().add(new FCAccountHolderRegistry.FCAccountHolderRegistryStateDTO(fcRegId, ah.getName()));
+            // use the fcRegId of the finco as parent key for each account holder
+            ah.getAccounts().forEach(acc -> getACCReg().createAccount(ahRegId, acc.getType(), acc.getBalance()));
+        });
+    }
+
     /**
      * Classes used for receive method above.
      */
@@ -179,6 +189,18 @@ public class FinCoWorker extends BaseActor implements WorkerActor,
     static public class GetAllAccounts extends FinCoRequest {
         public GetAllAccounts(IDeferred<String> req) {
             super(req);
+        }
+    }
+
+    static public class AddAccountHolders extends BasicDeferredMessage<String> {
+        public static final String FC_BY_ID_LIST_KEY = "FC_BY_ID_LIST_KEY";
+
+        public AddAccountHolders(IDeferred<String> req) {
+            super(req);
+        }
+
+        public List<FCData.FinCoById> getFinCoByIdList() {
+            return ((FCData.FinCoByIdList) arg(FC_BY_ID_LIST_KEY)).getFinCoByIdList();
         }
     }
 }

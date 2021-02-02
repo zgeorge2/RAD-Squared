@@ -38,13 +38,38 @@ public class FCData {
         }
     }
 
-    public static class FinCo extends FCData {
-        private String name; // the name of the Fin Co (e.g., Citibank)
-        private String branch; // the LAX branch
+    public static class FinCoByIdList extends FCData {
+        private final List<FinCoById> finCoByIdList;
+
+        public FinCoByIdList() {
+            this.finCoByIdList = new ArrayList<>();
+        }
+
+        @JsonProperty
+        public List<FinCoById> getFinCoByIdList() {
+            return finCoByIdList;
+        }
+    }
+
+    public static class FinCoBase extends FCData {
         private final List<FCAccHol> accountHolders;
 
-        public FinCo() {
+        public FinCoBase() {
             this.accountHolders = new ArrayList<>();
+        }
+
+        @JsonProperty
+        public List<FCAccHol> getAccountHolders() {
+            return accountHolders;
+        }
+    }
+
+    public static class FinCo extends FinCoBase {
+        private String name; // the name of the Fin Co (e.g., Citibank)
+        private String branch; // the LAX branch
+
+        public FinCo() {
+            super();
         }
 
         @JsonProperty
@@ -56,10 +81,18 @@ public class FCData {
         public String getBranch() {
             return branch;
         }
+    }
+
+    public static class FinCoById extends FinCoBase {
+        private String finCoId; // the FC Branch id (e.g.,Citibank/Bank1)
+
+        public FinCoById() {
+            super();
+        }
 
         @JsonProperty
-        public List<FCAccHol> getAccountHolders() {
-            return accountHolders;
+        public String getFinCoId() {
+            return finCoId;
         }
     }
 
