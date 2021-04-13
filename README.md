@@ -16,7 +16,7 @@ Download and install
 
  - To run a node (say, LAX)(For NYC or SEA, change the --akka.conf & --server.port accordingly). 
  - Select profile as basic or dev.
- 
+
 `$ cd <RAD^2 repo root dir>`
 
 `$ java -jar ./rad2-sb/target/rad2-sb-1.0-SNAPSHOT.jar 
@@ -32,7 +32,7 @@ Download and install
  - Default credentials - `basic/basic` for the `basic` profile
  - Content-Type - `application/json`
 
-##### DBeaver (Community Edition) (or other Database Viewer)
+###### DBeaver (Community Edition) (or other Database Viewer)
 Download & Install DBeaver from https://dbeaver.io/download/
 For connection setup, search for "Apache Ignite" in the "All" category. 
 Choose and add port 10800. You can leave the rest of the unfilled entries as-is.
@@ -42,5 +42,25 @@ It may fail because the right driver version isn't present.
 A prompt will come up to auto-download the  correct version. Click Ok 
 Now re-test the connection. 
 
+
+##### TERRAFORM/AWS CLUSTER DEPLOYMENT (WIP - DO NOT USE)
+Specific instructions carried out are listed here. 
+ - Step 0: Do a maven clean and package. This gets the jars ready. 
+ - Step 1: Create an AWS Account; Download and install Terraform; add terraform to path. 
+ - Step 2: Install or upgrade and then configure the AWS CLI (need at least the "default" profile)
+ - Step 3: Run Terraform (dev setup only - 3 node cluster; see rad2_dev_vars.tf for values used)
+ - Step 4: Sets up a 3 node cluster. Launch AWS EC2 dashboard to see public IPv4 addrs of Cluster
+
+`$ cd <RAD^2 repo root dir>/terraform`
+
+`$ terraform init`
+
+`$ terraform plan`
+
+`$ terraform apply`
+
+When you are ready to get rid of the infrastructure created, use the following. 
+There is no going back after this. 
+`$ terraform destroy`
  
 

@@ -49,9 +49,7 @@ public class SBApplication {
             logger.debug("reading properties from supplied application.properties");
             Properties appProperties = readProperties(System.getProperty("configPath") + "/app/" + "application" +
                     ".properties");
-            appProperties.stringPropertyNames().forEach((key) -> {
-            	System.setProperty(key, appProperties.getProperty(key));
-            });
+            appProperties.stringPropertyNames().forEach((key) -> System.setProperty(key, appProperties.getProperty(key)));
         }
     }
 
