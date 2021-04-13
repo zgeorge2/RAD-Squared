@@ -8,6 +8,12 @@ node_modules/
 .idea/
 *.iml
 
+# Terraform local files
+.terraform/
+.terraform.*
+terraform.tfstate*
+*.pem
+
 # Compiled class file
 *.class
 
