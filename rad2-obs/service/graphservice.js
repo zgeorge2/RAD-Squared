@@ -60,7 +60,19 @@ GraphService.prototype.getDynamicLinksWithMessage = function(interval, nodeId) {
 			})
 			.catch(reject);
 	});
-}; 
+};
+
+GraphService.prototype.getCurrentNscState = async function() {
+	try {
+		let timestamp = await databaseProvider.getLastFixedLinkTimestamp();
+		let secondsBehind = (new Date().getTime() - timestamp.getTime())/1000;
+		console.log(`Fetching the actor state from ${timestamp}, which is ${secondsBehind} seconds behind current time`);
+		let result = await databaseProvider.getSecondLevelFixedActorLinksAtTimestamp(timestamp);
+		return result;
+	} catch(e) {
+		throw e;
+	}
+};
 
 new GraphService();
 

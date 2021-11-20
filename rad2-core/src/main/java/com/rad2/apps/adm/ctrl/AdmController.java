@@ -10,6 +10,7 @@ import akka.actor.ActorSelection;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rad2.akka.router.MasterRouter;
 import com.rad2.apps.adm.akka.NodeAdmin;
+import com.rad2.common.utils.PrintUtils;
 import com.rad2.ctrl.BaseController;
 
 import java.util.ArrayList;
@@ -32,6 +33,16 @@ public class AdmController extends BaseController {
         this.getRouter(dto.getSystem(), dto.getRouter()).tell(new MasterRouter.RemoveRoutees(), ActorRef.noSender());
     }
 
+    public void updateMultipleRoutees(List<UpdateRouteesDTO> dtos) {
+        for(UpdateRouteesDTO dto: dtos) {
+            ActorSelection sel = this.getRouter(dto.getSystem(), dto.getRouter());
+
+            if(sel != null) {
+                sel.tell(new MasterRouter.UpdateRoutees(dto.getFinalCount()), ActorRef.noSender());
+            }
+        }
+    }
+
     private ActorSelection getNodeAdmin() {
         return getAU().getActor(getAU().getLocalSystemName(), NodeAdmin.NODE_ADMIN_NAME);
     }
@@ -46,6 +57,7 @@ public class AdmController extends BaseController {
     public static class UpdateRouteesDTO {
         private String router;
         private String system;
+        private int    finalCount;
 
         @JsonProperty
         public String getRouter() {
@@ -55,6 +67,11 @@ public class AdmController extends BaseController {
         @JsonProperty
         public String getSystem() {
             return system;
+        }
+
+        @JsonProperty
+        public int getFinalCount() {
+            return finalCount;
         }
     }
 }

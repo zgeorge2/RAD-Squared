@@ -97,6 +97,14 @@ BaseProvider.prototype.updateOrCreateManyFixedLinks = function(entities) {
 	throw new MethodNotOveriddenException();
 }
 
+BaseProvider.prototype.getLastFixedLinkTimestam = function() {
+	throw new MethodNotOveriddenException();
+}
+
+BaseProvider.prototype.getSecondLevelFixedActorLinks = function(timestamp) {
+	throw new MethodNotOveriddenException();
+}
+
 //*************************Dynamic Link***************************
 
 BaseProvider.prototype.createDynamicLink = function(entity) {

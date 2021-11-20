@@ -14,6 +14,7 @@ const config = require('../config/masterconfig').express;
 const graphController = require('../controllers/graphcontroller')();
 const ingestionController =  require('../controllers/ingestioncontroller')();
 const alertController = require('../controllers/alertcontroller')();
+const policyController = require('../controllers/policycontroller')();
 
 // Middleware
 const middleware = require('../middleware');
@@ -48,6 +49,12 @@ var setUpServer = function() {
 		app.get('/api/dynamiclinks/:type/message', graphController.getDynamicLinksWithMessage);
 
 		app.get('/api/alert/event', alertController.getAlertEvents);
+
+		app.get('/api/graph/nsc-state', graphController.getCurrentNscState);
+
+		app.get('/api/policy/execute', policyController.executePolicy);
+
+		app.get('/api/policy/apply', policyController.applyPolicy);
 
 		app.use(bodyParser.text({limit: '100mb'}));
 		app.post('/write', ingestionController.ingestMetric);

@@ -18,7 +18,7 @@ function GraphController() {
 
 
 GraphController.prototype.getNodesAndFixedLinks = function(req, res, next) {
-	graphService.getNodesAndFixedLinks(req.query.interval*60000)
+	graphService.getNodesAndFixedLinks(req.query.interval*1000)
 		.then((result) => {
 			res.send(result);
 		})
@@ -26,7 +26,7 @@ GraphController.prototype.getNodesAndFixedLinks = function(req, res, next) {
 };
 
 GraphController.prototype.getDynamicLinks = function(req, res, next) {
-	graphService.getDynamicLinks(req.query.interval*60000, req.params.type, req.query.widththreshold)
+	graphService.getDynamicLinks(req.query.interval*1000, req.params.type, req.query.widththreshold)
 		.then(result => {
 			res.send(result);
 		})
@@ -34,11 +34,21 @@ GraphController.prototype.getDynamicLinks = function(req, res, next) {
 }
 
 GraphController.prototype.getDynamicLinksWithMessage = function(req, res, next) {
-	graphService.getDynamicLinksWithMessage(req.query.interval*60000, req.query.nodeId)
+	graphService.getDynamicLinksWithMessage(req.query.interval*1000, req.query.nodeId)
 		.then((messages => {
 			res.render('message2', {messages : messages, nodeId : req.query.nodeId});
 		}))
 		.catch(console.log);
+}
+
+GraphController.prototype.getCurrentNscState = async function(req, res, next) {
+	graphService.getCurrentNscState()
+		.then(result => {
+			res.send(result);
+		})
+		.catch(err => {
+			res.send(err);
+		})
 }
 
 new GraphController();

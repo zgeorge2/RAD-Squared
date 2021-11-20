@@ -64,5 +64,10 @@ module.exports = {
 			}
 		},
 		asyncChunkSize : 1000
+	},
+	rad2: {
+		url: "localhost:9080",
+		username: "basic",
+		password: "basic"
 	}
 }

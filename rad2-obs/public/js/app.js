@@ -42,7 +42,7 @@ var clusterId;
 var network;
 
 //Query Arguments for graph query
-var dataInterval = 5;
+var dataInterval = 10;
 var tickTime = 5000;
 var widthThreshold = 0.5;
 

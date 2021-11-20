@@ -13,6 +13,7 @@
   "author": "Ishaan Kohli",
   "license": "BSD-2",
   "dependencies": {
+    "axios": "^0.24.0",
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
     "eslint": "^5.16.0",

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.List;
+
 /**
  * Administrative Resource end point provides some common controls applicable to ANY RAD-2 application
  */
@@ -42,6 +44,12 @@ public class AdmResource extends BaseResource<AdmController> {
         this.getC().removeRoutees(dto);
         return new PrintOut(String.format("Removing routees of [%s] in system [%s] ...",
                 dto.getRouter(), dto.getSystem()));
+    }
+
+    @PostMapping("/updateRoutees")
+    public PrintOut updateMultipleRoutees(@RequestBody List<AdmController.UpdateRouteesDTO> dtos) {
+        this.getC().updateMultipleRoutees(dtos);
+        return new PrintOut(String.format("Removing routees from multiple routers in multiple systems"));
     }
 
     /**

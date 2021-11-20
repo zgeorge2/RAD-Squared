@@ -60,8 +60,14 @@ public class MasterRouter extends BaseActor {
                         .match(Terminated.class, this::terminated)
                         .match(IncreaseRoutees.class, this::increaseRoutees)
                         .match(RemoveRoutees.class, this::removeRoutees)
+                        .match(UpdateRoutees.class, this::updateRoutees)
                         .matchAny(this::passItOn)
                         .build());
+    }
+
+    @ActorMessageHandler
+    private int getRoutees(GetRoutees g) {
+        return this.router.routees().size();
     }
 
 
@@ -101,7 +107,7 @@ public class MasterRouter extends BaseActor {
             PrintUtils.print("Terminated: No router configured! NOTHING TO DO!!");
             return;
         }
-        PrintUtils.print("Inc Routees: in [%s]", this.getAU().getLocalSystemName());
+        PrintUtils.print("Inc Routees: in [%s]", this.self().path().toString());
         router = router.addRoutee(this.createWorker("I"));
     }
 
@@ -111,11 +117,39 @@ public class MasterRouter extends BaseActor {
      */
     @ActorMessageHandler
     private void removeRoutees(RemoveRoutees arg) {
-        PrintUtils.print("Removing a routee: in [%s]", this.getAU().getLocalSystemName());
+        if(this.router.routees().size() == 1) {
+            PrintUtils.print("Can't remove routee, minimum 1 routee required: in [%s]", this.self().path().toString());
+            return;
+        }
+        PrintUtils.print("Removing a routee: in [%s]", this.self().path().toString());
         Routee routeeToRemove = router.routees().last();
         router = router.removeRoutee(routeeToRemove);
         routeeToRemove.send(new Terminate(), self());
         lastId.decrementAndGet();
+    }
+
+    /**
+     * Update Routees for this router. We send a final value for routees and this function sends increase/remove routee
+     * messages to itself to adjust it's size to given argument
+     */
+    @ActorMessageHandler
+    private void updateRoutees(UpdateRoutees arg) {
+        if(arg.finalCount < 1) {
+            PrintUtils.print("Final size can't be less than 1, Context: [%s]", this.self().path().toString());
+            return;
+        }
+
+        int currentSize = this.router.routees().size();
+
+        while(currentSize != arg.finalCount) {
+            if(currentSize < arg.finalCount) {
+                self().tell(new IncreaseRoutees(), self());
+                currentSize++;
+            } else {
+                self().tell(new RemoveRoutees(), self());
+                currentSize--;
+            }
+        }
     }
 
 
@@ -166,6 +200,15 @@ public class MasterRouter extends BaseActor {
 
     }
 
+    static public class UpdateRoutees implements IAkkaSerializable {
+        int finalCount;
+        public UpdateRoutees(int finalCount) {
+            this.finalCount = finalCount;
+        }
+
+        public UpdateRoutees() {}
+    }
+
 
     static public class IncreaseRoutees implements IAkkaSerializable {
         int inc;
@@ -188,5 +231,9 @@ public class MasterRouter extends BaseActor {
         public RemoveRoutees(int dec) {
             this.dec = dec;
         }
+    }
+
+    static public class GetRoutees implements IAkkaSerializable {
+
     }
 }

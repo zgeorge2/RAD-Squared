@@ -1,0 +1,67 @@
+[
+    {
+        "path": "AkkaNYC/user/FinCoMaster",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/thirdPartyMasterRouter",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/networkSliceMaster",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/provResourceMasterRouter",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/jtRtr",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/jtRtr",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/thirdPartyMasterRouter",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/provRelationshipMasterRouter",
+        "count": 5
+    },
+    {
+
+        "path": "AkkaNYC/user/provResourceMasterRouter",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/networkSliceMaster",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/provRelationshipMasterRouter",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/FC_ACCOUNT_Master",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/FinCoMaster",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/pRtr",
+        "count": 5
+    },
+    {
+        "path": "AkkaNYC/user/pRtr",
+        "count": 5
+    },
+    {
+        "path": "AkkaLAX/user/FC_ACCOUNT_Master",
+        "count": 5
+    }
+  ]

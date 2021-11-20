@@ -1,9 +1,9 @@
-/*
+<%/*
  * Copyright (c) 2019-2020 VMware, Inc.
  * SPDX-License-Identifier: BSD-2-Clause
- */
+ */%>
 
-<html>
+
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
@@ -40,12 +40,13 @@
     <div class="container">
         <h1>RAD-2 Actor Monitor</h1>
         <div class"timer-button-list btn-group-togglespan">
-            <span class="btn btn-outline-secondary timer-button" value="1">1m</span>
-            <span class="btn btn-outline-primary timer-button" value="5">5m</span>
-            <span class="btn btn-outline-secondary timer-button" value="30">30m</span>
-            <span class="btn btn-outline-secondary timer-button" value="120">2h</span>
-            <span class="btn btn-outline-secondary timer-button" value="480">8h</span>
-            <span class="btn btn-outline-secondary timer-button" value="1440">1d</span>
+            <span class="btn btn-outline-primary timer-button" value="10">10s</span>
+            <span class="btn btn-outline-secondary timer-button" value="60">1m</span>
+            <span class="btn btn-outline-secondary timer-button" value="300">5m</span>
+            <span class="btn btn-outline-secondary timer-button" value="1800">30m</span>
+            <span class="btn btn-outline-secondary timer-button" value="7200">2h</span>
+            <span class="btn btn-outline-secondary timer-button" value="28800">8h</span>
+            <span class="btn btn-outline-secondary timer-button" value="86400">1d</span>
         </div>
 
         <div class="edge-toggle-button-list">
@@ -56,7 +57,7 @@
 
         <input type="range" class="custom-range" min="0" max="1" step="0.05" id="traffic-width">
 
-        <div class="row">
+
             <div id="mynetwork"  class="col-12"></div>
             <!-- <div class="col-4" id="info">
                 <h3>Lost Messages</h3>
@@ -65,7 +66,7 @@
                 </ul>
             </div> -->
             
-        </div>
+
         <div class = "actor-info hide">
                 <h3>Actor Information</h3>
                 Actor name - <strong><span id="actor-name">user/ping</span></strong>

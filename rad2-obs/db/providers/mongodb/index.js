@@ -167,6 +167,49 @@ MongoProvider.prototype.updateOrCreateManyFixedLinks = async function(entities) 
 	}
 }
 
+MongoProvider.prototype.getLastFixedLinkTimestamp = async function() {
+	try {
+		var timestamp = await fixedLinkSchema.find().sort({lastActive:-1}).limit(1)
+		return new Date(timestamp[0].lastActive);
+	} catch(e) {
+		throw e;
+	}
+}
+
+MongoProvider.prototype.getSecondLevelFixedActorLinksAtTimestamp = async function(timestamp) {
+	try {
+		var result = await fixedLinkSchema.aggregate([{ 
+			$project : { 
+				split_size : { 
+					$size: { $split: ["$from", "/"] }
+				},
+				from: "$from",
+				lastActive: "$lastActive"
+			}
+		},
+		{
+			$match : {
+				split_size : 3,
+				lastActive: timestamp
+			}
+		},
+		{
+			$group : {
+				_id : "$from",
+				doc: {
+					$max: {lastActive: "$lastActive", from: "$from"}
+				},
+				count : {
+					$sum : 1
+				}
+			}
+		}]);
+		return result;
+	} catch(e) {
+		throw e;
+	}
+}
+
 
 // Operations for Dynamic Links
 MongoProvider.prototype.createDynamicLink = async function(entity) {
