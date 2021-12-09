@@ -102,7 +102,7 @@ MongoProvider.prototype.updateOrCreateManyNodes = async function(entities) {
 
 	entities.forEach((node) =>{
 		node.lastActive = new Date(node.lastActive);
-		bulk.find({ id : new ObjectID(node.id)}).upsert().replaceOne({$set : node});
+		bulk.find({ id : new ObjectID(node.id)}).upsert().replace({$set : node});
 	});
 
 	try {
