@@ -156,7 +156,7 @@ MongoProvider.prototype.updateOrCreateManyFixedLinks = async function(entities) 
 
 	entities.forEach((fl) =>{
 		fl.lastActive = new Date(fl.lastActive);
-		bulk.find({ from : fl.from, to : fl.to}).upsert().replaceOne({$set : fl});
+		bulk.find({ from : fl.from, to : fl.to}).upsert().replaceOne(fl);
 	});
 
 	try {
