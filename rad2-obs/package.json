@@ -13,10 +13,10 @@
   "author": "Ishaan Kohli",
   "license": "BSD-2",
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.1",
     "ejs": "^2.6.1",
     "eslint": "^5.16.0",
-    "express": "^4.16.4",
+    "express": "^4.18.2",
     "mongoose": "^5.7.5",
     "raw-body": "^2.3.3",
     "request": "^2.88.0",
