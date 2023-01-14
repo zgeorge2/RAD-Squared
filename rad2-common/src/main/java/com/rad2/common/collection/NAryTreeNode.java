@@ -5,19 +5,23 @@
 
 package com.rad2.common.collection;
 
-import com.rad2.common.utils.PrintUtils;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class NAryTreeNode<T> {
-    private NAryTreeNode parent;
-    private Map<String, NAryTreeNode<T>> children;
-    private T data; // the data stored in this node
-    private String name; // the name of this node. used for lookups
-    private int level; // the level of the node in the tree. Root level = 0;
+    private NAryTreeNode<T> parent;
+    private final Map<String, NAryTreeNode<T>> children;
+    private final T data; // the data stored in this node
+    private final String name; // the name of this node. used for lookups
+    private final int level; // the level of the node in the tree. Root level = 0;
 
     public NAryTreeNode(String name, T data) {
         this(null, name, data); // the root node if the parent isn't specified.
@@ -34,7 +38,7 @@ public class NAryTreeNode<T> {
     /**
      * Get the list of nodes that are the ancestors of this node.
      *
-     * @return
+     * @return list of nodes that are the ancestors of this node.
      */
     public List<NAryTreeNode<T>> getPathParts() {
         if (this.isRoot()) {
@@ -48,9 +52,9 @@ public class NAryTreeNode<T> {
     }
 
     /**
-     * Get the path names leading upto this node starting with the root of the tree
+     * Getter.
      *
-     * @return
+     * @return the path names leading upto this node starting with the root of the tree.
      */
     public String getPath() {
         if (this.isRoot()) {
@@ -60,9 +64,9 @@ public class NAryTreeNode<T> {
     }
 
     /**
-     * Get the root of this tree
+     * Getter
      *
-     * @return
+     * @return the root of this tree.
      */
     public NAryTreeNode<T> getRoot() {
         if (this.isRoot()) {
@@ -72,9 +76,9 @@ public class NAryTreeNode<T> {
     }
 
     /**
-     * Finds the first occurrence of a node with the given name in tree rooted at the root node of this node
+     * Finder.
      *
-     * @return
+     * @return the first occurrence of a node with the given name in tree rooted at the root node of this node.
      */
     public NAryTreeNode<T> findInTree(String name) {
         if (Objects.isNull(name)) {
@@ -85,9 +89,9 @@ public class NAryTreeNode<T> {
     }
 
     /**
-     * Finds the first occurrence of a node with the given name in the subtree rooted at this node
+     * Finder.
      *
-     * @return
+     * @return the first occurrence of a node with the given name in the subtree rooted at this node.
      */
     public NAryTreeNode<T> find(String name) {
         if (!Objects.isNull(name) && this.getName().equals(name)) {
@@ -100,42 +104,24 @@ public class NAryTreeNode<T> {
         return ret;
     }
 
-    /**
-     * Prints the node and its Data.
-     *
-     * @return
-     */
+    @Override
     public String toString() {
         return String.format("%s[%d]: [Data: %s]", this.getPath(), this.getLevel(), this.getData());
     }
 
     /**
-     * Print the members of the tree rooted at this node.
-     */
-    public void printTree() {
-        if (this.children.isEmpty()) {
-            PrintUtils.print("[%s] ", this);
-            return;
-        }
-        PrintUtils.print("[%s] ", this);
-        this.getChildren().values().forEach(node -> {
-            node.printTree();
-        });
-    }
-
-    /**
-     * Perform a breadth first traversal of the tree starting at the root, and perform the provided Function
-     * at each node visited.
+     * Perform a breadth first traversal of the tree starting at the root, and perform the provided Function at each
+     * node visited.
      */
     public <R> Map<String, R> traverseBreadthFirst(Function<NAryTreeNode<T>, R> func) {
         return this.traverseBreadthFirst(func, Integer.MAX_VALUE);
     }
 
     /**
-     * Perform a breadth first traversal of the tree starting at the root, and perform the provided Function
-     * at each node visited. Limit traversal starting from level 0 (root node) upto and including the
-     * specified level. maxLevel has to be greater than or equal to 0. if maxLevel is greater than the
-     * maxLevel of the tree, all nodes are traversed. If maxLevel is negative, all nodes are traversed.
+     * Perform a breadth first traversal of the tree starting at the root, and perform the provided Function at each
+     * node visited. Limit traversal starting from level 0 (root node) upto and including the specified level. maxLevel
+     * has to be greater than or equal to 0. if maxLevel is greater than the maxLevel of the tree, all nodes are
+     * traversed. If maxLevel is negative, all nodes are traversed.
      */
     public <R> Map<String, R> traverseBreadthFirst(Function<NAryTreeNode<T>, R> func, int maxLevel) {
         maxLevel = ((maxLevel < 0) ? Integer.MAX_VALUE : maxLevel);
@@ -155,71 +141,70 @@ public class NAryTreeNode<T> {
         NAryTreeNode<T> node = queue.remove(); // pop the queue
         resultMap.put(node.getPath(), func.apply(node));
         queue.addAll(node.getChildren().values().stream()
-            .filter(val -> (val.getLevel() <= maxLevel))
-            .collect(Collectors.toList()));// add the children for traversal upto and incl maxLevel
+                .filter(val -> (val.getLevel() <= maxLevel))
+                .collect(Collectors.toList()));// add the children for traversal upto and incl maxLevel
         traverseBreadthFirstHelper(queue, resultMap, func, maxLevel);
     }
 
     /**
-     * Get the parent of this node
+     * Getter.
      *
-     * @return
+     * @return the parent of this node.
      */
     public NAryTreeNode<T> getParent() {
         return this.parent;
     }
 
     /**
-     * Get the level of this node in the tree. The root node is at level 0.
+     * Getter.
      *
-     * @return
+     * @return the level of this node in the tree. The root node is at level 0.
      */
     public int getLevel() {
         return level;
     }
 
     /**
-     * Get the name of this node. The name is a component of the path leading up to this node. No two child
-     * nodes of a parent node can have the same name.
+     * Getter.
      *
-     * @return
+     * @return the name of this node. The name is a component of the path leading up to this node. No two child nodes of
+     * a parent node can have the same name.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * get the data held by this node
+     * getter.
      *
-     * @return
+     * @return the data held by this node
      */
     public T getData() {
         return data;
     }
 
     /**
-     * Returns true if this is the root of the tree. Else false.
+     * Getter.
      *
-     * @return
+     * @return Returns true if this is the root of the tree. Else false.
      */
     public boolean isRoot() {
         return Objects.isNull(this.getParent());
     }
 
     /**
-     * Get the children of this node
+     * Getter.
      *
-     * @return
+     * @return the children of this node
      */
     public Map<String, NAryTreeNode<T>> getChildren() {
         return this.children;
     }
 
     /**
-     * Remove the child node. If no such node can be found, then returns null. else returns the node that was
-     * removed.
+     * Remove the child node. If no such node can be found, then returns null. else returns the node that was removed.
      *
-     * @return
+     * @return the removed child node or null.
      */
     public NAryTreeNode<T> removeChild(String name) {
         NAryTreeNode<T> child = this.getChildren().get(name);
@@ -255,9 +240,9 @@ public class NAryTreeNode<T> {
 
     /**
      * Add a collection of child and descendant nodes specified by INaryTreeNodeData DTOs. The children in the
-     * collection are descendants at any level in the tree and hence, is a flattened list, with NO particular
-     * ordering. If a node in the list references a non-existent named node in the list, it is NOT added to
-     * the tree. So also, if circular relationships exist, then the last one wins and this is indeterminate.
+     * collection are descendants at any level in the tree and hence, is a flattened list, with NO particular ordering.
+     * If a node in the list references a non-existent named node in the list, it is NOT added to the tree. So also, if
+     * circular relationships exist, then the last one wins and this is indeterminate.
      *
      * @return the root of the resulting tree
      */
@@ -276,13 +261,13 @@ public class NAryTreeNode<T> {
         }
         // first turn the List of children into a Map referenced by child's treeNodeName
         Map<String, INAryTreeNodeData> childMap =
-            children.stream().collect(Collectors.toMap(e -> e.getTreeNodeName(), Function.identity()));
-        // Create a predicate that will partion the children into immediate children of this node
+                children.stream().collect(Collectors.toMap(INAryTreeNodeData::getTreeNodeName, Function.identity()));
+        // Create a predicate that will partition the children into immediate children of this node
         // and descendents
         Predicate<INAryTreeNodeData> immediateChildren =
-            child -> child.getParentTreeNodeName().equals(this.getName());
+                child -> child.getParentTreeNodeName().equals(this.getName());
         Map<Boolean, List<INAryTreeNodeData>> partitioning =
-            childMap.values().stream().collect(Collectors.partitioningBy(immediateChildren));
+                childMap.values().stream().collect(Collectors.partitioningBy(immediateChildren));
         // now add the immediate children to this node.
         partitioning.get(true).forEach(iNode -> this.addChild(iNode.getTreeNodeName(), iNode.getData()));
         // then try to add the remaining descendants to the children of this node.

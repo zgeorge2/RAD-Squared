@@ -30,8 +30,8 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
     private static final String DEAD_LETTER_OFFICE_ACTOR_NAME = "dead-letter-office";
     private static final Timeout TIMEOUT = new Timeout(Duration.create(2, TimeUnit.SECONDS));
     private RegistryManager rm;
-    private String registryId; // id of the local system in SCReg
-    private ActorSystem system;
+    private final String registryId; // id of the local system in SCReg
+    private final ActorSystem system;
 
     public AkkaActorSystemUtility(SystemProperties sysProps, RegistryManager rm) {
         PrintUtils.print("*** Creating AkkaActorSystemUtility ***");
@@ -60,7 +60,7 @@ public class AkkaActorSystemUtility implements UsesRegistryManager {
     }
 
     /**
-     * setup a shutdown hook for the actor system to shutdown gracefully
+     * set up a shutdown hook for the actor system to shut down gracefully
      */
     public void setupActorSystemShutdown() {
         PrintUtils.print("Setting up Actor System shutdown hook ...");

@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class IgniteQueries {
     // Map<MODEL CLASS, Map<QUERY NAME, QUERY TEMPLATE>>
-    private Map<String, Map<String, String>> modelClassToQueryMap;
+    private final Map<String, Map<String, String>> modelClassToQueryMap;
 
     public IgniteQueries() {
         this.modelClassToQueryMap = new HashMap<>();
@@ -42,24 +42,18 @@ public class IgniteQueries {
     }
 
     private Map<String, String> getQueryMap(String queryModelClass) {
-        Map<String, String> ret = this.modelClassToQueryMap.get(queryModelClass);
-        if (ret == null) {
-            ret = new HashMap<>();
-            this.modelClassToQueryMap.put(queryModelClass, ret);
-        }
-        return ret;
+        return this.modelClassToQueryMap.computeIfAbsent(queryModelClass, k -> new HashMap<>());
     }
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        this.modelClassToQueryMap.entrySet()
-            .forEach(mClassEntry -> {
-                sb.append(String.format("%s:", mClassEntry.getKey())).append("\n");
-                mClassEntry.getValue().entrySet().forEach(qEntry -> {
-                    sb.append(String.format("\t[%s] -> [%s]", mClassEntry.getKey(), mClassEntry.getValue()));
-                    sb.append("\n");
-                });
+        this.modelClassToQueryMap.forEach((key, value) -> {
+            sb.append(String.format("%s:", key)).append("\n");
+            value.forEach((key1, value1) -> {
+                sb.append(String.format("\t[%s] -> [%s]", key, value));
+                sb.append("\n");
             });
+        });
         return sb.toString();
     }
 }

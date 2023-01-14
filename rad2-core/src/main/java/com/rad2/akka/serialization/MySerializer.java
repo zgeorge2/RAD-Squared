@@ -13,10 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rad2.common.serialization.IAkkaSerializable;
 
 import java.io.IOException;
-import java.io.NotSerializableException;
 
 public class MySerializer extends SerializerWithStringManifest {
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
     public MySerializer() {
         this.mapper = new ObjectMapper();
@@ -32,7 +31,7 @@ public class MySerializer extends SerializerWithStringManifest {
     }
 
     @Override
-    public Object fromBinary(byte[] bytes, String manifest) throws NotSerializableException {
+    public Object fromBinary(byte[] bytes, String manifest) {
         Object ret = null;
         try {
             ret = mapper.readValue(bytes, Class.forName(manifest));
